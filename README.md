@@ -1,0 +1,27 @@
+# EmBrace Me
+
+# DevLog Entry 1 - 11/14/2025
+
+## Meet the Team!
+Tools Lead: Jared Nussbaum
+
+Engine Lead: Jared Nussbaum
+
+Design Lead: Torrey Spear
+
+Testing Lead: Tate Maguire
+
+Writing Lead: Jared Nussbaum
+
+## Tools and Materials
+Engine: Godot - all of our group members are extremely comfortable in Godot, and some have multiple years of experience. We want to make something good, so we are going with an engine that allows for that.
+
+Language: C# - A good game programming language
+
+Tools: Procreate for artwork, as that is what our artists are most comfortable with.
+
+AI: Absolutely none! We are game developers, and as such, we will not be using AI tools on this project as they take away a lot of the learning and creativity of the game-making process.
+
+## Outlook
+
+Our team is hoping to implement a touching story in which the player becomes romantically involved with the Brace AI. Most teams will be focusing on making gameplay mechanics, but we want to deliver a story experience that stays with players after playing.
