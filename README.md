@@ -24,4 +24,4 @@ AI: Absolutely none! We are game developers, and as such, we will not be using A
 
 ## Outlook
 
-Our team is hoping to implement a touching story in which the player becomes romantically involved with the Brace AI. Most teams will be focusing on making gameplay mechanics, but we want to deliver a story experience that stays with players after playing.
+Our team is hoping to implement a touching story in which the player becomes romantically involved with the Brace AI. Most teams will be focusing on making gameplay mechanics, but we want to deliver a story experience that stays with players after playing. We see that it may be difficult to include a physics puzzle in our game, but we will perservere and figure it out. We are hoping to learn how to make a gameplay sequence that conveys emotion that ties into the game itself.
