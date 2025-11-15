@@ -3,7 +3,7 @@
 # DevLog Entry 1 - 11/14/2025
 
 ## Meet the Team!
-Tools Lead: Jared Nussbaum
+Tools Lead: Tate Maguire
 
 Engine Lead: Jared Nussbaum
 
