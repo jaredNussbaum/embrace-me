@@ -42,8 +42,9 @@
   ],
   "nodeModulesDir": "auto",
   "imports": {
+    "@types/cannon": "npm:@types/cannon@^0.1.13",
     "@types/three": "npm:@types/three@^0.181.0",
-    "enable3d": "npm:enable3d@^0.26.1",
+    "cannon-es": "npm:cannon-es@^0.20.0",
     "three": "npm:three@^0.181.2",
     "vite": "npm:vite@7"
   }
