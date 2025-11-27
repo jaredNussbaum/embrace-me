@@ -1,0 +1,19 @@
+canvas {
+  border: thin solid black;
+}
+
+button {
+  background: #a5f2c9;
+  border: 0px;
+  padding: 2px;
+  margin: 2px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #d7ffe0;
+}
+
+.selected_button {
+  background-color: rgb(134, 192, 143);
+}
