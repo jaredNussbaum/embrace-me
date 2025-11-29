@@ -20,10 +20,10 @@ Engine: Baseline javascript with Three.js and Oimo.js plugins for 3d rendering a
 
 Language: JS - A bad game programming language
 
-Tools: Procreate for artwork, as that is what our artists are most comfortable with.
+Tools: Codespace/ VS code
 
 AI: Absolutely none! We are game developers, and as such, we will not be using AI tools on this project as they take away a lot of the learning and creativity of the game-making process.
 
 ### Outlook
 
-Our team is hoping to implement a touching story in which the player becomes romantically involved with the Brace AI. Most teams will be focusing on making gameplay mechanics, but we want to deliver a story experience that stays with players after playing. We see that it may be difficult to include a physics puzzle in our game, but we will perservere and figure it out. We are hoping to learn how to make a gameplay sequence that conveys emotion that ties into the game itself.
+Our team is is going to impliment a simple physics based puzzle in a 3d enviornment, rendered all using outside libraries and Javascript.
