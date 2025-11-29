@@ -16,11 +16,11 @@ Writing Lead: Jared Nussbaum
 
 ### Tools and Materials
 
-Engine: Baseline javascript with Three.js and Oimo.js plugins for 3d rendering and physics.
+Engine: Baseline typescript with Three.js and cannon-es.js plugins for 3d rendering and physics.
 
-Language: JS - A bad game programming language
+Language: TS - A bad game programming language
 
-Tools: Codespace/ VS code
+Tools: Codespace/VS code, deno, vite
 
 AI: Absolutely none! We are game developers, and as such, we will not be using AI tools on this project as they take away a lot of the learning and creativity of the game-making process.
 
