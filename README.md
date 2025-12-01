@@ -6,9 +6,9 @@
 
 Tools Lead: Tate Maguire
 
-Engine Lead: Jared Nussbaum
+Engine Lead: Jared Nussbaum & Jade Sells
 
-Design Lead: Torrey Spear
+Design Lead: Torrey Spear & Jade Sells
 
 Testing Lead: Tate Maguire
 
