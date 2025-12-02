@@ -75,6 +75,16 @@ blueCube.addToGame(world, scene);
 const greenCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-3, 0, 0), 0x3bb143);
 greenCube.addToGame(world, scene);
 
+// TODO: Find a cleaner way to do this... why doesn't cannon have a collisionEvent type already
+type CollisionEvent = {
+  body: CANNON.Body;
+};
+greenCube.body.addEventListener("collide", (collisionEvent: CollisionEvent) => {
+  if (collisionEvent.body === blueCube.body) {
+    winGame();
+  }
+});
+
 // ######################################################
 //
 // Game Loop
@@ -89,7 +99,6 @@ function animate() {
   greenCube.updateMesh();
 
   //check the win/lose condition every frame
-  checkWin();
   checkLose();
 
   renderer.render(scene, camera);
@@ -127,28 +136,6 @@ document.addEventListener("keydown", (e) => {
     set_vy(0);
   }
 });
-
-// ######################################################
-//
-// Check for Win Condition
-//
-// ######################################################
-
-function checkWin() {
-  const bluePos = blueCube.body.position;
-  const greenPos = greenCube.body.position;
-
-  const dx = bluePos.x - greenPos.x;
-  const dy = bluePos.y - greenPos.y;
-  const dz = bluePos.z - greenPos.z;
-
-  const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-  if (distance < 1.2) {
-    console.log("winna winna chicken dinnaaaaaaa");
-    winGame();
-  }
-}
 
 // ######################################################
 //
