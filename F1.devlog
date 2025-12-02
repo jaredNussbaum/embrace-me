@@ -1,0 +1,20 @@
+# bleh
+
+## F1 devlog - 12/1/2025
+
+### How We Satisfied the Software Requirements
+
+Our team first tackled the physics and 3D rendering problem as JS/TS dont support this level of game design.
+We used a combination of Three.js and Cannon-es.js for physics and rendering respectively.
+
+Our next challenge was making a physics based puzzle, and while it is physics based, its a puzzle for someone of much younger age perhaps. But it is a good demonstation of the Three.js and Cannon-es.js system in action.The goal is to move one cube to the location of the other while preventing it from moving out of view. If this happens, the player loses and is forced to restart.
+
+That satisfies the next requirement, of having a win and lose condition, if the two cubes collide, the player wins, of one of the cubes leaves the field of view, the player loses. 
+
+Our team is also using VS Code, Codespace, Deno, and Vite, so we all have built in forms of autoformatting as well as Linting, shoutout deno task fmt.
+
+Lastly we deploy our code to Github Pages as our final requirement of "some post-push automation".
+
+### Reflection
+
+Our plan changed drastically from our initial goal of a satirical AI dating sim, as when we made the plan, we didn't have access to the requirements and limitations. So our new goal was to just go with the flow. So we moved onto to just implementing the physics and rendering and seeing where things go from there. We mostly stuck with what roles we were assigned, only switching engines and tools as opposed to jobs. Overall not too bad, and hopefully we can get averything else done just as seamlessly. 
