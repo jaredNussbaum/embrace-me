@@ -41,7 +41,7 @@ document.body.appendChild(ui);
 
 // ######################################################
 //
-// Player Bounds
+// Player and Camera Bounds
 //
 // #####################################################
 
@@ -51,6 +51,11 @@ const BOUNDS = {
   minY: -5,
   maxY: 5,
 };
+
+let cameraOffsetX = 0;
+
+//when the player moves the camera shifts to their new location
+const CAMERA_SHIFT_X = BOUNDS.maxX - BOUNDS.minX;
 
 // ######################################################
 //
@@ -100,6 +105,9 @@ function animate() {
 
   //check the win/lose condition every frame
   checkLose();
+
+  //check player/camera location
+  checkCameraShift();
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
@@ -185,4 +193,30 @@ function checkLose() {
 function loseGame() {
   const ui = document.getElementById("ui-text");
   if (ui) ui.innerText = "Game Over - Cube Has Left The Bounds";
+}
+
+// ######################################################
+//
+// Camera Functionality
+//
+// ######################################################
+
+function updateCameraPosition() {
+  camera.position.x = cameraOffsetX;
+}
+
+function checkCameraShift() {
+  const pos = purpleCube.body.position;
+
+  // Player went too far RIGHT
+  if (pos.x > cameraOffsetX + BOUNDS.maxX) {
+    cameraOffsetX += CAMERA_SHIFT_X;
+    updateCameraPosition();
+  }
+
+  // Player went too far LEFT
+  if (pos.x < cameraOffsetX + BOUNDS.minX) {
+    cameraOffsetX -= CAMERA_SHIFT_X;
+    updateCameraPosition();
+  }
 }
