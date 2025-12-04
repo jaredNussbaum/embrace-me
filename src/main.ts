@@ -1,6 +1,6 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
-import { Box } from "./object.ts";
+import { Box, GameObject } from "./object.ts";
 import "./style.css";
 
 const viewportWidth = globalThis.innerWidth;
@@ -21,6 +21,34 @@ document.body.appendChild(canvas);
 
 // SEPARATE Cannon physics setup
 const world = new CANNON.World();
+
+// ######################################################
+//
+// 3D Mouse Events
+//
+// ######################################################
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+function underPointer(object: GameObject): boolean {
+  raycaster.setFromCamera(pointer, camera);
+  const intersections = raycaster.intersectObject(object.mesh);
+  return intersections.length > 0;
+}
+
+canvas.addEventListener("click", (event: MouseEvent) => {
+  pointer.x = (event.offsetX / viewportWidth) * 2 - 1;
+  pointer.y = -(event.offsetY / viewportHeight) * 2 + 1;
+
+  if (underPointer(greenCube)) {
+    console.log("GREEENENENENE");
+  }
+
+  if (underPointer(blueCube)) {
+    console.log("blue...");
+  }
+});
 
 // ######################################################
 //
