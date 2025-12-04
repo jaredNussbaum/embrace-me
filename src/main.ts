@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 import { Box, GameObject } from "./object.ts";
@@ -39,6 +40,8 @@ const contactMaterial = new CANNON.ContactMaterial(
   {
     friction: 0.0,
     restitution: 0.0,
+    frictionEquationRelaxation: 3,
+    frictionEquationStiffness: 1e7,
   },
 );
 
@@ -142,6 +145,24 @@ greenCube.body.addEventListener("collide", (collisionEvent: CollisionEvent) => {
   }
 });
 
+purpleCube.body.material = defaultMaterial;
+blueCube.body.material = defaultMaterial;
+greenCube.body.material = defaultMaterial;
+
+purpleCube.body.fixedRotation = true;
+greenCube.body.fixedRotation = true;
+blueCube.body.fixedRotation = true;
+
+//fix the weight
+purpleCube.body.linearDamping = 0.9;
+purpleCube.body.angularDamping = 0.7;
+
+blueCube.body.linearDamping = 0.9;
+blueCube.body.angularDamping = 1;
+
+greenCube.body.linearDamping = 0.9;
+greenCube.body.angularDamping = 1;
+
 // ######################################################
 //
 // Walls
@@ -149,26 +170,67 @@ greenCube.body.addEventListener("collide", (collisionEvent: CollisionEvent) => {
 // ######################################################
 
 // Mass of 0 means it doesn't move!
-const bottomWall = new Box(new CANNON.Vec3(19, 1, 15), new CANNON.Vec3(0, -5, 0), 0x222222, 0);
+const bottomWall = new Box(new CANNON.Vec3(55, 1, 15), new CANNON.Vec3(0, -4, 0), 0x222222, 0);
 bottomWall.addToGame(world, scene);
-/*
-const rightWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(9, 0, 0), 0x444444, 0);
+
+const rightWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(9, -1, 1.5), 0x444444, 0);
 rightWall.addToGame(world, scene);
 
-const leftWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(-9, 0, 0), 0x444444, 0);
+const rightWall2 = new Box(new CANNON.Vec3(1, 2, 2), new CANNON.Vec3(9, 2, -1.5), 0x444444, 0);
+rightWall2.addToGame(world, scene);
+
+const rightWall3 = new Box(new CANNON.Vec3(1, 8, 5), new CANNON.Vec3(9, -1, -5), 0x444444, 0);
+rightWall3.addToGame(world, scene);
+
+const leftWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(-9, -1, 1.5), 0x444444, 0);
 leftWall.addToGame(world, scene);
 
-const backWall = new Box(new CANNON.Vec3(22, 7.6, 1), new CANNON.Vec3(0, 0, -9), 0x333333, 0);
+const leftWall2 = new Box(new CANNON.Vec3(1, 3, 2), new CANNON.Vec3(-9, -3, -1.5), 0xffffff, 0);
+leftWall2.addToGame(world, scene);
+
+const leftWall3 = new Box(new CANNON.Vec3(1, 8, 5), new CANNON.Vec3(-9, -1, -5), 0x444444, 0);
+leftWall3.addToGame(world, scene);
+
+const backWall = new Box(new CANNON.Vec3(50, 8, 1), new CANNON.Vec3(0, -1, -8), 0x333333, 0);
 backWall.addToGame(world, scene);
-*/
+
+//other wroom walls
+const rightRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(25, -1, -1.5), 0x444444, 0);
+rightRoomWall.addToGame(world, scene);
+
+const leftRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(-25, -1, -1.5), 0x444444, 0);
+leftRoomWall.addToGame(world, scene);
+
 //add new material to all rendered shapes to prevent sticking n stuff
-purpleCube.body.material = defaultMaterial;
-blueCube.body.material = defaultMaterial;
-greenCube.body.material = defaultMaterial;
 bottomWall.body.material = defaultMaterial;
-//rightWall.body.material  = defaultMaterial;
-//leftWall.body.material   = defaultMaterial;
-//backWall.body.material   = defaultMaterial;
+rightWall.body.material = defaultMaterial;
+leftWall.body.material = defaultMaterial;
+backWall.body.material = defaultMaterial;
+rightRoomWall.body.material = defaultMaterial;
+
+// ######################################################
+//
+// Left Room
+//
+// ######################################################
+/*
+const LeftbottomWall = new Box(new CANNON.Vec3(10, 1, 15), new CANNON.Vec3(-20, -4, 0), 0x222222, 0);
+LeftbottomWall.addToGame(world, scene);
+
+const LeftrightWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(9, 0, 0), 0x444444, 0);
+LeftrightWall.addToGame(world, scene);
+
+const LeftleftWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(-9, 0, 0), 0x444444, 0);
+LeftleftWall.addToGame(world, scene);
+
+const LeftbackWall = new Box(new CANNON.Vec3(22, 7.6, 1), new CANNON.Vec3(0, 0, -9), 0x333333, 0);
+LeftbackWall.addToGame(world, scene);
+
+LeftbottomWall.body.material = defaultMaterial;
+LeftrightWall.body.material  = defaultMaterial;
+LeftleftWall.body.material   = defaultMaterial;
+LeftbackWall.body.material   = defaultMaterial;
+*/
 
 // ######################################################
 //
@@ -228,6 +290,38 @@ document.addEventListener("keydown", (e) => {
     set_vz(1);
   } else {
     set_vz(0);
+  }
+});
+
+// ######################################################
+//
+// Jump Functionality
+//
+// ######################################################
+
+let isGrounded = false;
+
+purpleCube.body.addEventListener("collide", (ev: any) => {
+  if (ev.body === bottomWall.body || ev.body === greenCube.body || ev.body === blueCube.body) {
+    isGrounded = true;
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "d") set_vx(1);
+  else if (e.key === "a") set_vx(-1);
+  else if (e.key !== "d" && e.key !== "a") set_vx(0);
+
+  if (e.key === "w") set_vz(-1);
+  else if (e.key === "s") set_vz(1);
+  else if (e.key !== "w" && e.key !== "s") set_vz(0);
+
+  // Jump
+  if (e.code === "Space") {
+    if (isGrounded) {
+      purpleCube.body.velocity.y = 9; //jump height
+      isGrounded = false;
+    }
   }
 });
 
