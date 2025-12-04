@@ -63,7 +63,7 @@ const CAMERA_SHIFT_X = BOUNDS.maxX - BOUNDS.minX;
 //
 // ######################################################
 
-const purpleCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0);
+const purpleCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2);
 purpleCube.body.angularVelocity.set(0, 10, 0);
 purpleCube.body.angularDamping = 0.5;
 purpleCube.addToGame(world, scene);
@@ -74,10 +74,10 @@ purpleCube.addToGame(world, scene);
 //
 // ######################################################
 
-const blueCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(3, 0, 0), 0x00a0ff);
+const blueCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(3, 0, 0), 0x00a0ff, 2);
 blueCube.addToGame(world, scene);
 
-const greenCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-3, 0, 0), 0x3bb143);
+const greenCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-3, 0, 0), 0x3bb143, 2);
 greenCube.addToGame(world, scene);
 
 // TODO: Find a cleaner way to do this... why doesn't cannon have a collisionEvent type already
@@ -97,19 +97,18 @@ greenCube.body.addEventListener("collide", (collisionEvent: CollisionEvent) => {
 //
 // ######################################################
 
-/*
-const bottomWall = new Box(new CANNON.Vec3(20, 1, 15), new CANNON.Vec3(0, -4, 0), 0x333333);
+// Mass of 0 means it doesn't move!
+const bottomWall = new Box(new CANNON.Vec3(20, 1, 15), new CANNON.Vec3(0, -4, 0), 0x333333, 0);
 bottomWall.addToGame(world, scene);
 
-const rightWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(9, 0, 0), 0xFFFFFF);
+const rightWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(9, 0, 0), 0xFFFFFF, 0);
 rightWall.addToGame(world, scene);
 
-const leftWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(-9, 0, 0), 0xFFFFFF);
+const leftWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(-9, 0, 0), 0xFFFFFF, 0);
 leftWall.addToGame(world, scene);
 
-const backWall = new Box(new CANNON.Vec3(22, 7.6, 1), new CANNON.Vec3(0, 0, -9), 0x444444);
+const backWall = new Box(new CANNON.Vec3(22, 7.6, 1), new CANNON.Vec3(0, 0, -9), 0x444444, 0);
 backWall.addToGame(world, scene);
-*/
 
 // ######################################################
 //

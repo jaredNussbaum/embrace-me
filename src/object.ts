@@ -19,14 +19,14 @@ class GameObject {
 }
 
 class Box extends GameObject {
-  constructor(size: CANNON.Vec3, position: CANNON.Vec3, color: THREE.ColorRepresentation) {
+  constructor(size: CANNON.Vec3, position: CANNON.Vec3, color: THREE.ColorRepresentation, mass: number) {
     const geo = new THREE.BoxGeometry(size.x, size.y, size.z);
     const mat = new THREE.MeshBasicMaterial({ color: color });
     const render = new THREE.Mesh(geo, mat);
 
     const halfExtents = new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2);
     const shape = new CANNON.Box(halfExtents);
-    const body = new CANNON.Body({ mass: 2 });
+    const body = new CANNON.Body({ mass: mass });
     body.addShape(shape);
 
     render.position.copy(position);
