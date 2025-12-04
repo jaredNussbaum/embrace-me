@@ -210,30 +210,6 @@ rightRoomWall.body.material = defaultMaterial;
 
 // ######################################################
 //
-// Left Room
-//
-// ######################################################
-/*
-const LeftbottomWall = new Box(new CANNON.Vec3(10, 1, 15), new CANNON.Vec3(-20, -4, 0), 0x222222, 0);
-LeftbottomWall.addToGame(world, scene);
-
-const LeftrightWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(9, 0, 0), 0x444444, 0);
-LeftrightWall.addToGame(world, scene);
-
-const LeftleftWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(-9, 0, 0), 0x444444, 0);
-LeftleftWall.addToGame(world, scene);
-
-const LeftbackWall = new Box(new CANNON.Vec3(22, 7.6, 1), new CANNON.Vec3(0, 0, -9), 0x333333, 0);
-LeftbackWall.addToGame(world, scene);
-
-LeftbottomWall.body.material = defaultMaterial;
-LeftrightWall.body.material  = defaultMaterial;
-LeftleftWall.body.material   = defaultMaterial;
-LeftbackWall.body.material   = defaultMaterial;
-*/
-
-// ######################################################
-//
 // Key Functionality
 //
 // ######################################################
