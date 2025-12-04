@@ -11,7 +11,8 @@ const speed = 2;
 // Three.js setup
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight);
-camera.position.z = 5;
+camera.position.z = 6.5;
+camera.rotation.x = -0.25;
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(viewportWidth, viewportHeight);
@@ -21,6 +22,28 @@ document.body.appendChild(canvas);
 
 // SEPARATE Cannon physics setup
 const world = new CANNON.World();
+
+//add gravity
+world.gravity.set(0, -9.82, 0); // x, y, z gravity
+
+//add a new material to add friction and sliding
+//i need to immortalize how poorly i spelled material in the above comment by writing
+// "martereil"
+//then 2 minutes later i was like lmfao who wrote that comment thats embarrasing
+//it was me. i wrote that.
+const defaultMaterial = new CANNON.Material("default");
+
+const contactMaterial = new CANNON.ContactMaterial(
+  defaultMaterial,
+  defaultMaterial,
+  {
+    friction: 0.0,
+    restitution: 0.0,
+  },
+);
+
+world.addContactMaterial(contactMaterial);
+world.defaultContactMaterial = contactMaterial;
 
 // ######################################################
 //
@@ -74,8 +97,8 @@ document.body.appendChild(ui);
 // #####################################################
 
 const BOUNDS = {
-  minX: -8,
-  maxX: 8,
+  minX: -9,
+  maxX: 9,
   minY: -5,
   maxY: 5,
 };
@@ -126,17 +149,26 @@ greenCube.body.addEventListener("collide", (collisionEvent: CollisionEvent) => {
 // ######################################################
 
 // Mass of 0 means it doesn't move!
-const bottomWall = new Box(new CANNON.Vec3(20, 1, 15), new CANNON.Vec3(0, -4, 0), 0x333333, 0);
+const bottomWall = new Box(new CANNON.Vec3(19, 1, 15), new CANNON.Vec3(0, -5, 0), 0x222222, 0);
 bottomWall.addToGame(world, scene);
-
-const rightWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(9, 0, 0), 0xFFFFFF, 0);
+/*
+const rightWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(9, 0, 0), 0x444444, 0);
 rightWall.addToGame(world, scene);
 
-const leftWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(-9, 0, 0), 0xFFFFFF, 0);
+const leftWall = new Box(new CANNON.Vec3(1, 6, 11.5), new CANNON.Vec3(-9, 0, 0), 0x444444, 0);
 leftWall.addToGame(world, scene);
 
-const backWall = new Box(new CANNON.Vec3(22, 7.6, 1), new CANNON.Vec3(0, 0, -9), 0x444444, 0);
+const backWall = new Box(new CANNON.Vec3(22, 7.6, 1), new CANNON.Vec3(0, 0, -9), 0x333333, 0);
 backWall.addToGame(world, scene);
+*/
+//add new material to all rendered shapes to prevent sticking n stuff
+purpleCube.body.material = defaultMaterial;
+blueCube.body.material = defaultMaterial;
+greenCube.body.material = defaultMaterial;
+bottomWall.body.material = defaultMaterial;
+//rightWall.body.material  = defaultMaterial;
+//leftWall.body.material   = defaultMaterial;
+//backWall.body.material   = defaultMaterial;
 
 // ######################################################
 //
@@ -177,8 +209,8 @@ animate();
 function set_vx(dir: number) {
   purpleCube.body.velocity.x = speed * dir;
 }
-function set_vy(dir: number) {
-  purpleCube.body.velocity.y = speed * dir;
+function set_vz(dir: number) {
+  purpleCube.body.velocity.z = speed * dir;
 }
 
 document.addEventListener("keydown", (e) => {
@@ -191,11 +223,11 @@ document.addEventListener("keydown", (e) => {
   }
 
   if ((e as KeyboardEvent).key == "w") {
-    set_vy(1);
+    set_vz(-1);
   } else if ((e as KeyboardEvent).key == "s") {
-    set_vy(-1);
+    set_vz(1);
   } else {
-    set_vy(0);
+    set_vz(0);
   }
 });
 
