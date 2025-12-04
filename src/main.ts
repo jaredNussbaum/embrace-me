@@ -8,6 +8,7 @@ const viewportWidth = globalThis.innerWidth;
 const viewportHeight = globalThis.innerHeight;
 
 const speed = 2;
+let has_key = false;
 
 // Three.js setup
 const scene = new THREE.Scene();
@@ -28,10 +29,6 @@ const world = new CANNON.World();
 world.gravity.set(0, -9.82, 0); // x, y, z gravity
 
 //add a new material to add friction and sliding
-//i need to immortalize how poorly i spelled material in the above comment by writing
-// "martereil"
-//then 2 minutes later i was like lmfao who wrote that comment thats embarrasing
-//it was me. i wrote that.
 const defaultMaterial = new CANNON.Material("default");
 
 const contactMaterial = new CANNON.ContactMaterial(
@@ -67,12 +64,22 @@ canvas.addEventListener("click", (event: MouseEvent) => {
   pointer.x = (event.offsetX / viewportWidth) * 2 - 1;
   pointer.y = -(event.offsetY / viewportHeight) * 2 + 1;
 
-  if (underPointer(greenCube)) {
-    alert("This is the green box!");
+  if (underPointer(keyCube)) {
+    alert("You've picked up the key!");
+    has_key = true;
+
+    //explode the key cube
+    scene.remove(keyCube.mesh);
+    world.removeBody(keyCube.body);
   }
 
-  if (underPointer(blueCube)) {
-    alert("This is the blue box...");
+  if (underPointer(chestCube)) {
+    if (has_key === false) {
+      alert("You need the key to unlock this chest!");
+    } else {
+      alert("you've unlocked the chest! You Win!");
+      winGame();
+    }
   }
 });
 
@@ -90,7 +97,7 @@ ui.style.left = "20px";
 ui.style.color = "white";
 ui.style.fontSize = "32px";
 ui.style.fontFamily = "Arial";
-ui.innerText = "Move the blue cube to the green cube to win!\nControls: WASD to Move; SPACE to Stop";
+ui.innerText = "Collect the key and open the chest to win!!\nControls: WASD to Move; SPACE to Jump";
 document.body.appendChild(ui);
 
 // ######################################################
@@ -134,16 +141,16 @@ blueCube.addToGame(world, scene);
 const greenCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-3, 0, 0), 0x3bb143, 2);
 greenCube.addToGame(world, scene);
 
+const keyCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-20, 0, 0), 0xfff135, 2);
+keyCube.addToGame(world, scene);
+
+const chestCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(20, 0, 0), 0x7b3f00, 2);
+chestCube.addToGame(world, scene);
+
 // TODO: Find a cleaner way to do this... why doesn't cannon have a collisionEvent type already
 type CollisionEvent = {
   body: CANNON.Body;
 };
-
-greenCube.body.addEventListener("collide", (collisionEvent: CollisionEvent) => {
-  if (collisionEvent.body === blueCube.body) {
-    winGame();
-  }
-});
 
 purpleCube.body.material = defaultMaterial;
 blueCube.body.material = defaultMaterial;
@@ -185,7 +192,7 @@ rightWall3.addToGame(world, scene);
 const leftWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(-9, -1, 1.5), 0x444444, 0);
 leftWall.addToGame(world, scene);
 
-const leftWall2 = new Box(new CANNON.Vec3(1, 3, 2), new CANNON.Vec3(-9, -3, -1.5), 0xffffff, 0);
+const leftWall2 = new Box(new CANNON.Vec3(1, 3.5, 2), new CANNON.Vec3(-9, -3, -1.5), 0xffffff, 0);
 leftWall2.addToGame(world, scene);
 
 const leftWall3 = new Box(new CANNON.Vec3(1, 8, 5), new CANNON.Vec3(-9, -1, -5), 0x444444, 0);
@@ -201,18 +208,17 @@ rightRoomWall.addToGame(world, scene);
 const leftRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(-25, -1, -1.5), 0x444444, 0);
 leftRoomWall.addToGame(world, scene);
 
+const step = new Box(new CANNON.Vec3(1, 1, 2), new CANNON.Vec3(-10, -3, -1.5), 0x444444, 0);
+step.addToGame(world, scene);
+
 //add new material to all rendered shapes to prevent sticking n stuff
 bottomWall.body.material = defaultMaterial;
 rightWall.body.material = defaultMaterial;
 leftWall.body.material = defaultMaterial;
 backWall.body.material = defaultMaterial;
 rightRoomWall.body.material = defaultMaterial;
-
-// ######################################################
-//
-// Key Functionality
-//
-// ######################################################
+leftRoomWall.body.material = defaultMaterial;
+step.body.material = defaultMaterial;
 
 // ######################################################
 //
@@ -227,6 +233,8 @@ function animate() {
   purpleCube.updateMesh();
   blueCube.updateMesh();
   greenCube.updateMesh();
+  keyCube.updateMesh();
+  chestCube.updateMesh();
 
   //check the win/lose condition every frame
   checkLose();
@@ -261,7 +269,7 @@ function set_vz(dir: number) {
 let isGrounded = false;
 
 purpleCube.body.addEventListener("collide", (ev: any) => {
-  if (ev.body === bottomWall.body || ev.body === greenCube.body || ev.body === blueCube.body) {
+  if (ev.body === bottomWall.body || ev.body === greenCube.body || ev.body === blueCube.body || ev.body === step.body) {
     isGrounded = true;
   }
 });
@@ -315,9 +323,6 @@ function processInput() {
 // ######################################################
 
 function winGame() {
-  //ok so um rn this isnt chnaging th ebackground color and i think it has to do with css but im scared 🥺
-  //document.body.style.backgroundColor = "green";
-
   const ui = document.getElementById("ui-text");
   if (ui) ui.innerText = "YOU WON!";
 
