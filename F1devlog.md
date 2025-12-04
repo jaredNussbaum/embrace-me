@@ -1,6 +1,4 @@
-# bleh
-
-## F1 devlog - 12/1/2025
+# F1 devlog - 12/3/2025
 
 ### How We Satisfied the Software Requirements
 
