@@ -68,11 +68,11 @@ canvas.addEventListener("click", (event: MouseEvent) => {
   pointer.y = -(event.offsetY / viewportHeight) * 2 + 1;
 
   if (underPointer(greenCube)) {
-    console.log("GREEENENENENE");
+    alert("This is the green box!");
   }
 
   if (underPointer(blueCube)) {
-    console.log("blue...");
+    alert("This is the blue box...");
   }
 });
 
@@ -221,6 +221,7 @@ rightRoomWall.body.material = defaultMaterial;
 // ######################################################
 
 function animate() {
+  processInput();
   world.fixedStep();
 
   purpleCube.updateMesh();
@@ -236,7 +237,7 @@ function animate() {
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
-animate();
+setTimeout(animate, 100);
 
 // ######################################################
 //
@@ -250,24 +251,6 @@ function set_vx(dir: number) {
 function set_vz(dir: number) {
   purpleCube.body.velocity.z = speed * dir;
 }
-
-document.addEventListener("keydown", (e) => {
-  if ((e as KeyboardEvent).key == "d") {
-    set_vx(1);
-  } else if ((e as KeyboardEvent).key == "a") {
-    set_vx(-1);
-  } else {
-    set_vx(0);
-  }
-
-  if ((e as KeyboardEvent).key == "w") {
-    set_vz(-1);
-  } else if ((e as KeyboardEvent).key == "s") {
-    set_vz(1);
-  } else {
-    set_vz(0);
-  }
-});
 
 // ######################################################
 //
@@ -283,23 +266,47 @@ purpleCube.body.addEventListener("collide", (ev: any) => {
   }
 });
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "d") set_vx(1);
-  else if (e.key === "a") set_vx(-1);
-  else if (e.key !== "d" && e.key !== "a") set_vx(0);
+const input = {
+  up: false,
+  down: false,
+  left: false,
+  right: false,
+  jump: false,
+};
 
-  if (e.key === "w") set_vz(-1);
-  else if (e.key === "s") set_vz(1);
-  else if (e.key !== "w" && e.key !== "s") set_vz(0);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "d") input.right = true;
+  if (e.key === "a") input.left = true;
+  if (e.key === "w") input.up = true;
+  if (e.key === "s") input.down = true;
+  if (e.code === "Space") input.jump = true;
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.key === "d") input.right = false;
+  if (e.key === "a") input.left = false;
+  if (e.key === "w") input.up = false;
+  if (e.key === "s") input.down = false;
+  if (e.code === "Space") input.jump = false;
+});
+
+function processInput() {
+  if (input.right) set_vx(1);
+  else if (input.left) set_vx(-1);
+  else if (!input.right && !input.left) set_vx(0);
+
+  if (input.up) set_vz(-1);
+  else if (input.down) set_vz(1);
+  else if (!input.up && !input.down) set_vz(0);
 
   // Jump
-  if (e.code === "Space") {
+  if (input.jump) {
     if (isGrounded) {
       purpleCube.body.velocity.y = 9; //jump height
       isGrounded = false;
     }
   }
-});
+}
 
 // ######################################################
 //
