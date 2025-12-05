@@ -208,6 +208,10 @@ leftWall3.addToGame(world, scene);
 const backWall = new Box(new CANNON.Vec3(50, 8, 1), new CANNON.Vec3(0, -1, -8), 0x333333, 0);
 backWall.addToGame(world, scene);
 
+const frontBorder = new Box(new CANNON.Vec3(50, 8, 1), new CANNON.Vec3(0, -1, 4), 0x00000000, 0);
+frontBorder.mesh.visible = false;
+frontBorder.addToGame(world, scene);
+
 //other wroom walls
 const rightRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(25, -1, -1.5), 0x444444, 0);
 rightRoomWall.addToGame(world, scene);
