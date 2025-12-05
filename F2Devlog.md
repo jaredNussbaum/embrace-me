@@ -5,11 +5,11 @@
 We continued to use Three.js and well as Cannon-es.js for our 3d rendering and physics simulation respectively.
 
 We then tackled the idea of different scenes/rooms, so there are now two rooms on either side of the man play area that the player can visit.
-and inside each of these rooms are items that can be clicked on and interacted with outside of physics stuff. 
+and inside each of these rooms are items that can be clicked on and interacted with outside of physics stuff.
 
 The must first solve our physics based puzzle to actually reach the second room, (spoliers, you just have move a cube over to it lol), but be careful once you get to the other side...
 
-Each of these rooms have another cube that he player may interact with clickong on. This is the second "puzzle" but its not physics based really. 
+Each of these rooms have another cube that he player may interact with clickong on. This is the second "puzzle" but its not physics based really.
 This puzzle is where we impliment the inventory. The player may interact with the key object to puck up the key into their inventory, and once they obtain it, they may unlock the chest.
 
 The game reaches its one conculsive ending once the chest is unlocked!

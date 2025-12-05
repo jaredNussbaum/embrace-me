@@ -100,6 +100,18 @@ ui.style.fontFamily = "Arial";
 ui.innerText = "Collect the key and open the chest to win!!\nControls: WASD to Move; SPACE to Jump";
 document.body.appendChild(ui);
 
+const uiHint = document.createElement("div");
+uiHint.id = "ui-hint";
+uiHint.style.position = "fixed";
+uiHint.style.top = "20px";
+uiHint.style.right = "20px"; // top-right corner
+uiHint.style.color = "white";
+uiHint.style.fontSize = "28px";
+uiHint.style.fontFamily = "Arial";
+uiHint.style.textAlign = "right";
+uiHint.innerText = ""; // starts empty
+document.body.appendChild(uiHint);
+
 // ######################################################
 //
 // Player and Camera Bounds
@@ -180,6 +192,13 @@ greenCube.body.angularDamping = 1;
 const bottomWall = new Box(new CANNON.Vec3(55, 1, 15), new CANNON.Vec3(0, -4, 0), 0x222222, 0);
 bottomWall.addToGame(world, scene);
 
+const rightWall = new Box(new CANNON.Vec3(1, 8, 20), new CANNON.Vec3(9, -1, 1.5), 0x444444, 0);
+rightWall.addToGame(world, scene);
+
+const door = new Box(new CANNON.Vec3(1, 5, 3), new CANNON.Vec3(8.5, -1, -2), 0x7b3f00, 0);
+door.addToGame(world, scene);
+
+/*
 const rightWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(9, -1, 1.5), 0x444444, 0);
 rightWall.addToGame(world, scene);
 
@@ -188,6 +207,7 @@ rightWall2.addToGame(world, scene);
 
 const rightWall3 = new Box(new CANNON.Vec3(1, 8, 5), new CANNON.Vec3(9, -1, -5), 0x444444, 0);
 rightWall3.addToGame(world, scene);
+*/
 
 const leftWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(-9, -1, 1.5), 0x444444, 0);
 leftWall.addToGame(world, scene);
@@ -242,6 +262,9 @@ function animate() {
   //check player/camera location
   checkCameraShift();
 
+  //display some hints meyhaps
+  updateHintText();
+
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
@@ -258,6 +281,10 @@ function set_vx(dir: number) {
 }
 function set_vz(dir: number) {
   purpleCube.body.velocity.z = speed * dir;
+}
+
+function distance(a: GameObject, b: GameObject) {
+  return a.body.position.vsub(b.body.position).length();
 }
 
 // ######################################################
@@ -315,6 +342,18 @@ function processInput() {
     }
   }
 }
+
+// ######################################################
+//
+// New Scene Functionality
+//
+// ######################################################
+
+purpleCube.body.addEventListener("collide", (collisionEvent: CollisionEvent) => {
+  if (collisionEvent.body === door.body || has_key === true) {
+    //TODO: add functionality such that when the player approaches the door, the scene changes
+  }
+});
 
 // ######################################################
 //
@@ -387,4 +426,31 @@ function checkCameraShift() {
     cameraOffsetX -= CAMERA_SHIFT_X;
     updateCameraPosition();
   }
+}
+
+// ######################################################
+//
+// Hint Text
+//
+// ######################################################
+
+function updateHintText() {
+  const uiHint = document.getElementById("ui-hint");
+  if (!uiHint) return;
+
+  const distKey = distance(purpleCube, keyCube);
+  const distDoor = distance(purpleCube, door);
+
+  if (!has_key && distKey < 5) {
+    uiHint.innerText = "Click the key to pick it up!";
+    return;
+  }
+
+  if (distDoor < 3) {
+    if (!has_key) uiHint.innerText = "The door is locked. You need the key.";
+    else uiHint.innerText = "You unlocked the door!";
+    return;
+  }
+
+  uiHint.innerText = "";
 }
