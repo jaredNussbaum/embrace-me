@@ -91,24 +91,11 @@ canvas.addEventListener("click", (event: MouseEvent) => {
 
 const ui = document.createElement("div");
 ui.id = "ui-text";
-ui.style.position = "fixed";
-ui.style.top = "20px";
-ui.style.left = "20px";
-ui.style.color = "white";
-ui.style.fontSize = "32px";
-ui.style.fontFamily = "Arial";
 ui.innerText = "Collect the key and open the chest to win!";
 document.body.appendChild(ui);
 
 const uiHint = document.createElement("div");
 uiHint.id = "ui-hint";
-uiHint.style.position = "fixed";
-uiHint.style.top = "20px";
-uiHint.style.right = "20px"; // top-right corner
-uiHint.style.color = "white";
-uiHint.style.fontSize = "28px";
-uiHint.style.fontFamily = "Arial";
-uiHint.style.textAlign = "right";
 uiHint.innerText = ""; // starts empty
 document.body.appendChild(uiHint);
 
@@ -268,7 +255,6 @@ function animate() {
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
-setTimeout(animate, 100);
 
 // ######################################################
 //
@@ -435,50 +421,38 @@ function checkCameraShift() {
 // ######################################################
 
 //sorry this looks like absolute poop, i am so bad with this kinda stuff
-const moveUI = document.createElement("div");
-moveUI.style.position = "fixed";
-moveUI.style.bottom = "-20px";
-moveUI.style.right = "10px";
-moveUI.style.display = "grid";
-moveUI.style.gridTemplateColumns = "80px 80px 80px";
-moveUI.style.gridTemplateRows = "80px 80px 80px 80px";
-moveUI.style.gap = "10px";
-moveUI.style.zIndex = "9999";
-document.body.appendChild(moveUI);
+const controlsUI = document.createElement("div");
+controlsUI.id = "controls-ui";
+document.body.appendChild(controlsUI);
 
 //button maker helper
-function makeButton(label: string) {
+function makeControlButton(label: string) {
   const button = document.createElement("button");
   button.innerText = label;
-  button.style.width = "80px";
-  button.style.height = "80px";
-  button.style.fontSize = "40px";
-  button.style.borderRadius = "20px"; //roundness lol
-  button.style.opacity = "0.7";
-  button.style.touchAction = "none"; //make it so no scorlling on phone
+  button.classList.add("control-button");
   return button;
 }
 
-const upButton = makeButton("⬆️");
-const leftButton = makeButton("⬅️");
-const rightButton = makeButton("➡️");
-const downButton = makeButton("⬇️");
-const jumpButton = makeButton("🆙"); //changed to emoji cos other laguages
+const upButton = makeControlButton("⬆️");
+const leftButton = makeControlButton("⬅️");
+const rightButton = makeControlButton("➡️");
+const downButton = makeControlButton("⬇️");
+const jumpButton = makeControlButton("🆙"); //changed to emoji cos other laguages
 
 //top row
-moveUI.appendChild(document.createElement("div")); // empty cell
-moveUI.appendChild(upButton);
-moveUI.appendChild(document.createElement("div"));
+controlsUI.appendChild(document.createElement("div")); // empty cell
+controlsUI.appendChild(upButton);
+controlsUI.appendChild(document.createElement("div"));
 
 //middle row
-moveUI.appendChild(leftButton);
-moveUI.appendChild(downButton);
-moveUI.appendChild(rightButton);
+controlsUI.appendChild(leftButton);
+controlsUI.appendChild(downButton);
+controlsUI.appendChild(rightButton);
 
 //bottom jump trow
-moveUI.appendChild(document.createElement("div"));
-moveUI.appendChild(jumpButton);
-moveUI.appendChild(document.createElement("div"));
+controlsUI.appendChild(document.createElement("div"));
+controlsUI.appendChild(jumpButton);
+controlsUI.appendChild(document.createElement("div"));
 
 //helper funct to bind mouse movement to buttons
 function bindButton(btn: HTMLButtonElement, onPress: () => void, onRelease: () => void) {
@@ -512,38 +486,19 @@ bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
 
 const startMenu = document.createElement("div");
 startMenu.id = "start-menu";
-startMenu.style.position = "fixed";
-startMenu.style.top = "0";
-startMenu.style.left = "0";
-startMenu.style.width = "100vw";
-startMenu.style.height = "100vh";
-startMenu.style.background = "0x000000";
-startMenu.style.display = "flex";
-startMenu.style.flexDirection = "column";
-startMenu.style.justifyContent = "center";
-startMenu.style.alignItems = "center";
-startMenu.style.zIndex = "99999";
-startMenu.style.color = "white";
-startMenu.style.fontFamily = "Arial";
-startMenu.style.fontSize = "36px";
 document.body.appendChild(startMenu);
 
 //game title
 const title = document.createElement("div");
 title.innerText = "GAME TITLE HERE";
-title.style.marginBottom = "40px";
+title.id = "title-text";
 startMenu.appendChild(title);
 
 //button helper
 function makeMenuButton(label: string): HTMLButtonElement {
   const button = document.createElement("button");
   button.innerText = label;
-  button.style.width = "300px";
-  button.style.padding = "20px";
-  button.style.margin = "10px";
-  button.style.fontSize = "24px";
-  button.style.borderRadius = "12px";
-  button.style.cursor = "pointer";
+  button.classList.add("menu-button");
   return button;
 }
 
