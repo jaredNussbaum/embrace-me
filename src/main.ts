@@ -454,3 +454,78 @@ function updateHintText() {
 
   uiHint.innerText = "";
 }
+
+// ######################################################
+//
+// Button Functionality
+//
+// ######################################################
+
+//sorry this looks like absolute poop, i am so bad with this kinda stuff
+const moveUI = document.createElement("div");
+moveUI.style.position = "fixed";
+moveUI.style.bottom = "-20px";
+moveUI.style.right = "10px";
+moveUI.style.display = "grid";
+moveUI.style.gridTemplateColumns = "80px 80px 80px";
+moveUI.style.gridTemplateRows = "80px 80px 80px 80px";
+moveUI.style.gap = "10px";
+moveUI.style.zIndex = "9999";
+document.body.appendChild(moveUI);
+
+function makeBtn(label: string) {
+  const button = document.createElement("button");
+  button.innerText = label;
+  button.style.width = "80px";
+  button.style.height = "80px";
+  button.style.fontSize = "40px";
+  button.style.borderRadius = "20px"; //roundness lol
+  button.style.opacity = "0.7";
+  button.style.touchAction = "none"; //make it so no scorlling on phone
+  return button;
+}
+
+const upButton = makeBtn("⬆️");
+const leftButton = makeBtn("⬅️");
+const rightButton = makeBtn("➡️");
+const downButton = makeBtn("⬇️");
+const jumpButton = makeBtn("jmp");
+
+//top row
+moveUI.appendChild(document.createElement("div")); // empty cell
+moveUI.appendChild(upButton);
+moveUI.appendChild(document.createElement("div"));
+
+//middle row
+moveUI.appendChild(leftButton);
+moveUI.appendChild(downButton);
+moveUI.appendChild(rightButton);
+
+//bottom jump trow
+moveUI.appendChild(document.createElement("div"));
+moveUI.appendChild(jumpButton);
+moveUI.appendChild(document.createElement("div"));
+
+//helper funct to bind mouse movement to buttons
+function bindButton(btn: HTMLButtonElement, onPress: () => void, onRelease: () => void) {
+  btn.addEventListener("mousedown", onPress);
+  btn.addEventListener("mouseup", onRelease);
+  btn.addEventListener("mouseleave", onRelease);
+
+  // touch support
+  btn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    onPress();
+  });
+  btn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    onRelease();
+  });
+}
+
+//bind buttons to WASD
+bindButton(upButton, () => input.up = true, () => input.up = false);
+bindButton(downButton, () => input.down = true, () => input.down = false);
+bindButton(leftButton, () => input.left = true, () => input.left = false);
+bindButton(rightButton, () => input.right = true, () => input.right = false);
+bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
