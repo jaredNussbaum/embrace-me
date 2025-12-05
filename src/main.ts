@@ -97,7 +97,7 @@ ui.style.left = "20px";
 ui.style.color = "white";
 ui.style.fontSize = "32px";
 ui.style.fontFamily = "Arial";
-ui.innerText = "Collect the key and open the chest to win!!\nControls: WASD to Move; SPACE to Jump";
+ui.innerText = "Collect the key and open the chest to win!";
 document.body.appendChild(ui);
 
 const uiHint = document.createElement("div");
@@ -430,33 +430,6 @@ function checkCameraShift() {
 
 // ######################################################
 //
-// Hint Text
-//
-// ######################################################
-
-function updateHintText() {
-  const uiHint = document.getElementById("ui-hint");
-  if (!uiHint) return;
-
-  const distKey = distance(purpleCube, keyCube);
-  const distDoor = distance(purpleCube, door);
-
-  if (!has_key && distKey < 5) {
-    uiHint.innerText = "Click the key to pick it up!";
-    return;
-  }
-
-  if (distDoor < 3) {
-    if (!has_key) uiHint.innerText = "The door is locked. You need the key.";
-    else uiHint.innerText = "You unlocked the door!";
-    return;
-  }
-
-  uiHint.innerText = "";
-}
-
-// ######################################################
-//
 // Button Functionality
 //
 // ######################################################
@@ -473,7 +446,8 @@ moveUI.style.gap = "10px";
 moveUI.style.zIndex = "9999";
 document.body.appendChild(moveUI);
 
-function makeBtn(label: string) {
+//button maker helper
+function makeButton(label: string) {
   const button = document.createElement("button");
   button.innerText = label;
   button.style.width = "80px";
@@ -485,11 +459,11 @@ function makeBtn(label: string) {
   return button;
 }
 
-const upButton = makeBtn("⬆️");
-const leftButton = makeBtn("⬅️");
-const rightButton = makeBtn("➡️");
-const downButton = makeBtn("⬇️");
-const jumpButton = makeBtn("jmp");
+const upButton = makeButton("⬆️");
+const leftButton = makeButton("⬅️");
+const rightButton = makeButton("➡️");
+const downButton = makeButton("⬇️");
+const jumpButton = makeButton("🆙"); //changed to emoji cos other laguages
 
 //top row
 moveUI.appendChild(document.createElement("div")); // empty cell
@@ -529,3 +503,149 @@ bindButton(downButton, () => input.down = true, () => input.down = false);
 bindButton(leftButton, () => input.left = true, () => input.left = false);
 bindButton(rightButton, () => input.right = true, () => input.right = false);
 bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
+
+//
+//
+// Starting Menu Functionality oh my god i cant spell
+//
+//
+
+const startMenu = document.createElement("div");
+startMenu.id = "start-menu";
+startMenu.style.position = "fixed";
+startMenu.style.top = "0";
+startMenu.style.left = "0";
+startMenu.style.width = "100vw";
+startMenu.style.height = "100vh";
+startMenu.style.background = "0x000000";
+startMenu.style.display = "flex";
+startMenu.style.flexDirection = "column";
+startMenu.style.justifyContent = "center";
+startMenu.style.alignItems = "center";
+startMenu.style.zIndex = "99999";
+startMenu.style.color = "white";
+startMenu.style.fontFamily = "Arial";
+startMenu.style.fontSize = "36px";
+document.body.appendChild(startMenu);
+
+//game title
+const title = document.createElement("div");
+title.innerText = "GAME TITLE HERE";
+title.style.marginBottom = "40px";
+startMenu.appendChild(title);
+
+//button helper
+function makeMenuButton(label: string): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.innerText = label;
+  button.style.width = "300px";
+  button.style.padding = "20px";
+  button.style.margin = "10px";
+  button.style.fontSize = "24px";
+  button.style.borderRadius = "12px";
+  button.style.cursor = "pointer";
+  return button;
+}
+
+// Language buttons
+const EngButton = makeMenuButton("English");
+const ArButton = makeMenuButton("Arabic");
+const ChButton = makeMenuButton("Chinese");
+startMenu.appendChild(EngButton);
+startMenu.appendChild(ArButton);
+startMenu.appendChild(ChButton);
+
+let selectedLanguage: string | null = null;
+let gameStarted = false;
+
+function startGame() {
+  if (!gameStarted) {
+    gameStarted = true;
+    animate();
+  }
+}
+
+EngButton.onclick = () => {
+  chooseLanguage("eng");
+  startMenu.style.display = "none";
+  startGame();
+};
+
+ArButton.onclick = () => {
+  chooseLanguage("ar");
+  startMenu.style.display = "none";
+  startGame();
+};
+
+ChButton.onclick = () => {
+  chooseLanguage("ch");
+  startMenu.style.display = "none";
+  startGame();
+};
+
+function chooseLanguage(lang: string) {
+  selectedLanguage = lang;
+
+  //display language
+  const ui = document.getElementById("ui-text");
+  if (ui) {
+    if (lang === "eng") {
+      ui.innerText = "Collect the key and open the chest to win!";
+    }
+    if (lang === "ar") {
+      ui.innerText = "احصل على المفتاح وافتح الصندوق للفوز!";
+    }
+    if (lang === "ch") {
+      ui.innerText = "收集钥匙，打开宝箱，即可获胜";
+    }
+  }
+}
+
+// ######################################################
+//
+// Hint Text
+//
+// ######################################################
+
+function updateHintText() {
+  const uiHint = document.getElementById("ui-hint");
+  if (!uiHint) return;
+
+  const distKey = distance(purpleCube, keyCube);
+  const distDoor = distance(purpleCube, door);
+
+  //please please please someone whos better at coding refactor this to not be ass
+  if (!has_key && distKey < 6) {
+    if (selectedLanguage === "eng") {
+      uiHint.innerText = "Click the key to pick it up!";
+    } else if (selectedLanguage === "ar") {
+      uiHint.innerText = "انقر على المفتاح لالتقاطه";
+    } else {
+      uiHint.innerText = "点击钥匙即可拾取。";
+    }
+    return;
+  }
+
+  if (distDoor < 3) {
+    if (!has_key) {
+      if (selectedLanguage === "eng") {
+        uiHint.innerText = "The door is locked. You need the key.";
+      } else if (selectedLanguage === "ar") {
+        uiHint.innerText = "الباب مُغلق. تحتاج المفتاح.";
+      } else {
+        uiHint.innerText = "门锁了，你需要钥匙";
+      }
+    } else {
+      if (selectedLanguage === "eng") {
+        uiHint.innerText = "You unlocked the door!";
+      } else if (selectedLanguage === "ar") {
+        uiHint.innerText = "لقد فتحت الباب";
+      } else {
+        uiHint.innerText = "你打开了门锁。";
+      }
+    }
+    return;
+  }
+
+  uiHint.innerText = "";
+}
