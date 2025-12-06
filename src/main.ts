@@ -42,7 +42,6 @@ const contactMaterial = new CANNON.ContactMaterial(
   },
 );
 
-world.addContactMaterial(contactMaterial);
 world.defaultContactMaterial = contactMaterial;
 
 // ######################################################
@@ -125,7 +124,7 @@ const CAMERA_SHIFT_X = BOUNDS.maxX - BOUNDS.minX;
 
 const purpleCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2);
 purpleCube.body.angularVelocity.set(0, 10, 0);
-purpleCube.body.angularDamping = 0.5;
+purpleCube.body.angularDamping = 0.6;
 purpleCube.addToGame(world, scene);
 
 // ######################################################
@@ -146,28 +145,8 @@ keyCube.addToGame(world, scene);
 const chestCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(20, 0, 0), 0x7b3f00, 2);
 chestCube.addToGame(world, scene);
 
-// TODO: Find a cleaner way to do this... why doesn't cannon have a collisionEvent type already
-type CollisionEvent = {
-  body: CANNON.Body;
-};
-
-purpleCube.body.material = defaultMaterial;
-blueCube.body.material = defaultMaterial;
-greenCube.body.material = defaultMaterial;
-
-purpleCube.body.fixedRotation = true;
-greenCube.body.fixedRotation = true;
-blueCube.body.fixedRotation = true;
-
-//fix the weight
-purpleCube.body.linearDamping = 0.9;
-purpleCube.body.angularDamping = 0.7;
-
-blueCube.body.linearDamping = 0.9;
-blueCube.body.angularDamping = 1;
-
-greenCube.body.linearDamping = 0.9;
-greenCube.body.angularDamping = 1;
+const door = new Box(new CANNON.Vec3(1, 5, 3), new CANNON.Vec3(8.5, -1, -2), 0x7b3f00, 0);
+door.addToGame(world, scene);
 
 // ######################################################
 //
@@ -181,20 +160,6 @@ bottomWall.addToGame(world, scene);
 
 const rightWall = new Box(new CANNON.Vec3(1, 8, 20), new CANNON.Vec3(9, -1, 1.5), 0x444444, 0);
 rightWall.addToGame(world, scene);
-
-const door = new Box(new CANNON.Vec3(1, 5, 3), new CANNON.Vec3(8.5, -1, -2), 0x7b3f00, 0);
-door.addToGame(world, scene);
-
-/*
-const rightWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(9, -1, 1.5), 0x444444, 0);
-rightWall.addToGame(world, scene);
-
-const rightWall2 = new Box(new CANNON.Vec3(1, 2, 2), new CANNON.Vec3(9, 2, -1.5), 0x444444, 0);
-rightWall2.addToGame(world, scene);
-
-const rightWall3 = new Box(new CANNON.Vec3(1, 8, 5), new CANNON.Vec3(9, -1, -5), 0x444444, 0);
-rightWall3.addToGame(world, scene);
-*/
 
 const leftWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(-9, -1, 1.5), 0x444444, 0);
 leftWall.addToGame(world, scene);
@@ -221,15 +186,6 @@ leftRoomWall.addToGame(world, scene);
 
 const step = new Box(new CANNON.Vec3(1, 1, 2), new CANNON.Vec3(-10, -3, -1.5), 0x444444, 0);
 step.addToGame(world, scene);
-
-//add new material to all rendered shapes to prevent sticking n stuff
-bottomWall.body.material = defaultMaterial;
-rightWall.body.material = defaultMaterial;
-leftWall.body.material = defaultMaterial;
-backWall.body.material = defaultMaterial;
-rightRoomWall.body.material = defaultMaterial;
-leftRoomWall.body.material = defaultMaterial;
-step.body.material = defaultMaterial;
 
 // ######################################################
 //
@@ -339,8 +295,8 @@ function processInput() {
 //
 // ######################################################
 
-purpleCube.body.addEventListener("collide", (collisionEvent: CollisionEvent) => {
-  if (collisionEvent.body === door.body || has_key === true) {
+purpleCube.body.addEventListener("collide", (ev: any) => {
+  if (ev.body === door.body || has_key === true) {
     //TODO: add functionality such that when the player approaches the door, the scene changes
   }
 });

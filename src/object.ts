@@ -26,7 +26,11 @@ class Box extends GameObject {
 
     const halfExtents = new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2);
     const shape = new CANNON.Box(halfExtents);
-    const body = new CANNON.Body({ mass: mass });
+    const body = new CANNON.Body({
+      mass: mass,
+      angularDamping: 1,
+      linearDamping: 0.9,
+    });
     body.addShape(shape);
 
     render.position.copy(position);
