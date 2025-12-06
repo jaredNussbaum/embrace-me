@@ -289,11 +289,15 @@ step.addToGame(world, scene);
 //
 // ######################################################
 
-function animate() {
-  playerCube.processInput(input);
-  world.fixedStep();
+let current_player: Player = playerCube;
+let current_scene: THREE.Scene = scene;
+let current_world: CANNON.World = world;
 
-  playerCube.updateMesh();
+function animate() {
+  current_player.processInput(input);
+  current_world.fixedStep();
+
+  current_player.updateMesh();
   blueCube.updateMesh();
   greenCube.updateMesh();
   keyCube.updateMesh();
@@ -308,7 +312,7 @@ function animate() {
   //display some hints meyhaps
   updateHintText();
 
-  renderer.render(scene, camera);
+  renderer.render(current_scene, camera);
   requestAnimationFrame(animate);
 }
 
@@ -365,8 +369,10 @@ document.addEventListener("keyup", (e) => {
 // ######################################################
 
 playerCube.body.addEventListener("collide", (ev: any) => {
-  if (ev.body === door.body || has_key === true) {
+  if (ev.body === door.body && has_key === true && !sc_2_booted) {
     //TODO: add functionality such that when the player approaches the door, the scene changes
+    scene.remove.apply(scene, scene.children);
+    boot_second_scene();
   }
 });
 
@@ -664,5 +670,56 @@ function loadGame() {
     uiHint.innerText = "تم تحميل اللعبة";
   } else {
     uiHint.innerText = "游戏已加载";
+  }
+}
+
+// ######################################################
+//
+// Second Scene
+//
+// ######################################################
+
+let sc_2_booted: Boolean = false;
+
+function boot_second_scene() {
+  // Three.js setup
+
+  const camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight);
+  camera.position.z = 6.5;
+  camera.rotation.x = -0.25;
+
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(viewportWidth, viewportHeight);
+  const world_2 = new CANNON.World();
+  const scene_2 = new THREE.Scene();
+  const canvas = renderer.domElement;
+  document.body.appendChild(canvas);
+
+  // SEPARATE Cannon physics setup
+
+  //add gravity
+  world_2.gravity.set(0, -9.82, 0); // x, y, z gravity
+
+  world_2.addContactMaterial(contactMaterial);
+  world_2.defaultContactMaterial = contactMaterial;
+  sc_2_booted = true;
+  instantiate_second_scene_objects(world_2, scene_2);
+}
+
+function instantiate_second_scene_objects(wrld: CANNON.World, sc: THREE.Scene) {
+  const playerCube_2 = new Player(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2, speed);
+  playerCube_2.addToGame(wrld, sc);
+  const bottomWall_2 = new Box(new CANNON.Vec3(55, 1, 15), new CANNON.Vec3(0, -4, 0), 0x222222, 0);
+  bottomWall_2.addToGame(wrld, sc);
+  current_player = playerCube_2;
+  current_scene = sc;
+  current_world = wrld;
+
+  if (selectedLanguage === "eng") {
+    ui.innerText = "Victory!!";
+  } else if (selectedLanguage === "ar") {
+    ui.innerText = "انتصار";
+  } else {
+    ui.innerText = "胜利";
   }
 }
