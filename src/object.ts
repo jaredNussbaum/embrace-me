@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 
@@ -40,4 +41,44 @@ class Box extends GameObject {
   }
 }
 
-export { Box, GameObject };
+class Player extends Box {
+  speed: number;
+  isGrounded: boolean;
+  constructor(size: CANNON.Vec3, position: CANNON.Vec3, color: THREE.ColorRepresentation, mass: number, speed: number) {
+    super(size, position, color, mass);
+
+    this.speed = speed;
+    this.isGrounded = true;
+
+    this.body.angularVelocity.set(0, 10, 0); // for fun!!
+    this.body.angularDamping = 0.6;
+  }
+  set_vx(dir: number) {
+    this.body.velocity.x = this.speed * dir;
+  }
+  set_vz(dir: number) {
+    this.body.velocity.z = this.speed * dir;
+  }
+  jump() {
+    this.body.velocity.y = 9; // jump height
+  }
+  processInput(input: any) {
+    if (input.right) this.set_vx(1);
+    else if (input.left) this.set_vx(-1);
+    else if (!input.right && !input.left) this.set_vx(0);
+
+    if (input.up) this.set_vz(-1);
+    else if (input.down) this.set_vz(1);
+    else if (!input.up && !input.down) this.set_vz(0);
+
+    // Jump
+    if (input.jump) {
+      if (this.isGrounded) {
+        this.jump();
+        this.isGrounded = false;
+      }
+    }
+  }
+}
+
+export { Box, GameObject, Player };

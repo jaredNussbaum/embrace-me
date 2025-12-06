@@ -1,7 +1,7 @@
 // deno-lint-ignore-file
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
-import { Box, GameObject } from "./object.ts";
+import { Box, GameObject, Player } from "./object.ts";
 import "./style.css";
 
 const viewportWidth = globalThis.innerWidth;
@@ -122,10 +122,8 @@ const CAMERA_SHIFT_X = BOUNDS.maxX - BOUNDS.minX;
 //
 // ######################################################
 
-const purpleCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2);
-purpleCube.body.angularVelocity.set(0, 10, 0);
-purpleCube.body.angularDamping = 0.6;
-purpleCube.addToGame(world, scene);
+const playerCube = new Player(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2, speed);
+playerCube.addToGame(world, scene);
 
 // ######################################################
 //
@@ -194,10 +192,10 @@ step.addToGame(world, scene);
 // ######################################################
 
 function animate() {
-  processInput();
+  playerCube.processInput(input);
   world.fixedStep();
 
-  purpleCube.updateMesh();
+  playerCube.updateMesh();
   blueCube.updateMesh();
   greenCube.updateMesh();
   keyCube.updateMesh();
@@ -222,28 +220,19 @@ function animate() {
 //
 // ######################################################
 
-function set_vx(dir: number) {
-  purpleCube.body.velocity.x = speed * dir;
-}
-function set_vz(dir: number) {
-  purpleCube.body.velocity.z = speed * dir;
-}
-
 function distance(a: GameObject, b: GameObject) {
   return a.body.position.vsub(b.body.position).length();
 }
 
 // ######################################################
 //
-// Jump Functionality
+// Player Input
 //
 // ######################################################
 
-let isGrounded = false;
-
-purpleCube.body.addEventListener("collide", (ev: any) => {
+playerCube.body.addEventListener("collide", (ev: any) => {
   if (ev.body === bottomWall.body || ev.body === greenCube.body || ev.body === blueCube.body || ev.body === step.body) {
-    isGrounded = true;
+    playerCube.isGrounded = true;
   }
 });
 
@@ -271,31 +260,13 @@ document.addEventListener("keyup", (e) => {
   if (e.code === "Space") input.jump = false;
 });
 
-function processInput() {
-  if (input.right) set_vx(1);
-  else if (input.left) set_vx(-1);
-  else if (!input.right && !input.left) set_vx(0);
-
-  if (input.up) set_vz(-1);
-  else if (input.down) set_vz(1);
-  else if (!input.up && !input.down) set_vz(0);
-
-  // Jump
-  if (input.jump) {
-    if (isGrounded) {
-      purpleCube.body.velocity.y = 9; //jump height
-      isGrounded = false;
-    }
-  }
-}
-
 // ######################################################
 //
 // New Scene Functionality
 //
 // ######################################################
 
-purpleCube.body.addEventListener("collide", (ev: any) => {
+playerCube.body.addEventListener("collide", (ev: any) => {
   if (ev.body === door.body || has_key === true) {
     //TODO: add functionality such that when the player approaches the door, the scene changes
   }
@@ -311,8 +282,8 @@ function winGame() {
   const ui = document.getElementById("ui-text");
   if (ui) ui.innerText = "YOU WON!";
 
-  purpleCube.body.velocity.set(0, 0, 0);
-  purpleCube.body.angularVelocity.set(0, 0, 0);
+  playerCube.body.velocity.set(0, 0, 0);
+  playerCube.body.angularVelocity.set(0, 0, 0);
 
   blueCube.body.velocity.set(0, 0, 0);
   blueCube.body.angularVelocity.set(0, 0, 0);
@@ -359,7 +330,7 @@ function updateCameraPosition() {
 }
 
 function checkCameraShift() {
-  const pos = purpleCube.body.position;
+  const pos = playerCube.body.position;
 
   // player moves to the room to the right
   if (pos.x > cameraOffsetX + BOUNDS.maxX) {
@@ -526,8 +497,8 @@ function updateHintText() {
   const uiHint = document.getElementById("ui-hint");
   if (!uiHint) return;
 
-  const distKey = distance(purpleCube, keyCube);
-  const distDoor = distance(purpleCube, door);
+  const distKey = distance(playerCube, keyCube);
+  const distDoor = distance(playerCube, door);
 
   //please please please someone whos better at coding refactor this to not be ass
   if (!has_key && distKey < 6) {
