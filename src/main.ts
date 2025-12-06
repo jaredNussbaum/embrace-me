@@ -46,6 +46,84 @@ world.defaultContactMaterial = contactMaterial;
 
 // ######################################################
 //
+// Starting Menu Functionality
+//
+// ######################################################
+
+const startMenu = document.createElement("div");
+startMenu.id = "start-menu";
+document.body.appendChild(startMenu);
+
+//game title
+const title = document.createElement("div");
+title.innerText = "GAME TITLE HERE";
+title.id = "title-text";
+startMenu.appendChild(title);
+
+//button helper
+function makeMenuButton(label: string): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.innerText = label;
+  button.classList.add("menu-button");
+  return button;
+}
+
+// Language buttons
+const EngButton = makeMenuButton("English");
+const ArButton = makeMenuButton("Arabic");
+const ChButton = makeMenuButton("Chinese");
+startMenu.appendChild(EngButton);
+startMenu.appendChild(ArButton);
+startMenu.appendChild(ChButton);
+
+let selectedLanguage: string | null = null;
+let gameStarted = false;
+
+function startGame() {
+  if (!gameStarted) {
+    gameStarted = true;
+    animate();
+  }
+}
+
+EngButton.onclick = () => {
+  chooseLanguage("eng");
+  startMenu.style.display = "none";
+  startGame();
+};
+
+ArButton.onclick = () => {
+  chooseLanguage("ar");
+  startMenu.style.display = "none";
+  startGame();
+};
+
+ChButton.onclick = () => {
+  chooseLanguage("ch");
+  startMenu.style.display = "none";
+  startGame();
+};
+
+function chooseLanguage(lang: string) {
+  selectedLanguage = lang;
+
+  //display language
+  const ui = document.getElementById("ui-text");
+  if (ui) {
+    if (lang === "eng") {
+      ui.innerText = "Collect the key and open the chest to win!";
+    }
+    if (lang === "ar") {
+      ui.innerText = "احصل على المفتاح وافتح الصندوق للفوز!";
+    }
+    if (lang === "ch") {
+      ui.innerText = "收集钥匙，打开宝箱，即可获胜";
+    }
+  }
+}
+
+// ######################################################
+//
 // 3D Mouse Events
 //
 // ######################################################
@@ -64,19 +142,39 @@ canvas.addEventListener("click", (event: MouseEvent) => {
   pointer.y = -(event.offsetY / viewportHeight) * 2 + 1;
 
   if (underPointer(keyCube)) {
-    alert("You've picked up the key!");
     has_key = true;
+
+    //change the language of the text
+    if (selectedLanguage === "eng") {
+      ui.innerText = "You've picked up the key!";
+    } else if (selectedLanguage === "ar") {
+      ui.innerText = "لقد التقطت المفتاح";
+    } else {
+      ui.innerText = "你已经拿到钥匙了。";
+    }
 
     //explode the key cube
     scene.remove(keyCube.mesh);
     world.removeBody(keyCube.body);
   }
 
-  if (underPointer(chestCube)) {
+  if (underPointer(door)) {
     if (has_key === false) {
-      alert("You need the key to unlock this chest!");
+      if (selectedLanguage === "eng") {
+        ui.innerText = "You need the key to unlock this door!";
+      } else if (selectedLanguage === "ar") {
+        ui.innerText = "تحتاج إلى المفتاح لفتح هذا الباب";
+      } else {
+        ui.innerText = "你需要钥匙才能打开这扇门。";
+      }
     } else {
-      alert("you've unlocked the chest! You Win!");
+      if (selectedLanguage === "eng") {
+        ui.innerText = "you've unlocked the door! You Win!";
+      } else if (selectedLanguage === "ar") {
+        ui.innerText = "لقد فتحت الباب! لقد فزت";
+      } else {
+        ui.innerText = "你已经打开了门！你赢了！";
+      }
       winGame();
     }
   }
@@ -95,7 +193,7 @@ document.body.appendChild(ui);
 
 const uiHint = document.createElement("div");
 uiHint.id = "ui-hint";
-uiHint.innerText = ""; // starts empty
+uiHint.innerText = ""; //starts blank
 document.body.appendChild(uiHint);
 
 // ######################################################
@@ -371,7 +469,7 @@ const downButton = makeControlButton("⬇️");
 const jumpButton = makeControlButton("🆙"); //changed to emoji cos other laguages
 
 //top row
-controlsUI.appendChild(document.createElement("div")); // empty cell
+controlsUI.appendChild(document.createElement("div")); //empty cell
 controlsUI.appendChild(upButton);
 controlsUI.appendChild(document.createElement("div"));
 
@@ -391,7 +489,7 @@ function bindButton(btn: HTMLButtonElement, onPress: () => void, onRelease: () =
   btn.addEventListener("mouseup", onRelease);
   btn.addEventListener("mouseleave", onRelease);
 
-  // touch support
+  //touch support
   btn.addEventListener("touchstart", (e) => {
     e.preventDefault();
     onPress();
@@ -409,84 +507,6 @@ bindButton(leftButton, () => input.left = true, () => input.left = false);
 bindButton(rightButton, () => input.right = true, () => input.right = false);
 bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
 
-//
-//
-// Starting Menu Functionality oh my god i cant spell
-//
-//
-
-const startMenu = document.createElement("div");
-startMenu.id = "start-menu";
-document.body.appendChild(startMenu);
-
-//game title
-const title = document.createElement("div");
-title.innerText = "GAME TITLE HERE";
-title.id = "title-text";
-startMenu.appendChild(title);
-
-//button helper
-function makeMenuButton(label: string): HTMLButtonElement {
-  const button = document.createElement("button");
-  button.innerText = label;
-  button.classList.add("menu-button");
-  return button;
-}
-
-// Language buttons
-const EngButton = makeMenuButton("English");
-const ArButton = makeMenuButton("Arabic");
-const ChButton = makeMenuButton("Chinese");
-startMenu.appendChild(EngButton);
-startMenu.appendChild(ArButton);
-startMenu.appendChild(ChButton);
-
-let selectedLanguage: string | null = null;
-let gameStarted = false;
-
-function startGame() {
-  if (!gameStarted) {
-    gameStarted = true;
-    animate();
-  }
-}
-
-EngButton.onclick = () => {
-  chooseLanguage("eng");
-  startMenu.style.display = "none";
-  startGame();
-};
-
-ArButton.onclick = () => {
-  chooseLanguage("ar");
-  startMenu.style.display = "none";
-  startGame();
-};
-
-ChButton.onclick = () => {
-  chooseLanguage("ch");
-  startMenu.style.display = "none";
-  startGame();
-};
-
-function chooseLanguage(lang: string) {
-  selectedLanguage = lang;
-
-  //display language
-  const ui = document.getElementById("ui-text");
-  if (ui) {
-    if (lang === "eng") {
-      ui.innerText = "Collect the key and open the chest to win!";
-    }
-    if (lang === "ar") {
-      ui.innerText = "احصل على المفتاح وافتح الصندوق للفوز!";
-    }
-    if (lang === "ch") {
-      ui.innerText = "收集钥匙，打开宝箱，即可获胜";
-    }
-  }
-}
-
 // ######################################################
 //
 // Hint Text
@@ -494,7 +514,7 @@ function chooseLanguage(lang: string) {
 // ######################################################
 
 function updateHintText() {
-  const uiHint = document.getElementById("ui-hint");
+  //const uiHint = document.getElementById("ui-hint");
   if (!uiHint) return;
 
   const distKey = distance(playerCube, keyCube);
@@ -533,5 +553,116 @@ function updateHintText() {
     return;
   }
 
-  uiHint.innerText = "";
+  //uiHint.innerText = "";
+}
+
+// ######################################################
+//
+// Save Game Functionality
+//
+// ######################################################
+
+const saveButton = makeMenuButton("Save Game");
+const loadButton = makeMenuButton("Load Game");
+
+const saveLoadUI = document.createElement("div");
+saveLoadUI.id = "save-load-ui";
+document.body.appendChild(saveLoadUI);
+
+saveLoadUI.appendChild(saveButton);
+saveLoadUI.appendChild(loadButton);
+
+saveButton.onclick = saveGame;
+loadButton.onclick = loadGame;
+
+function saveGame() {
+  const saveData = {
+    playerPosition: {
+      x: playerCube.body.position.x,
+      y: playerCube.body.position.y,
+      z: playerCube.body.position.z,
+    },
+    greenCubePos: {
+      x: greenCube.body.position.x,
+      y: greenCube.body.position.y,
+      z: greenCube.body.position.z,
+    },
+    blueCubePos: {
+      x: blueCube.body.position.x,
+      y: blueCube.body.position.y,
+      z: blueCube.body.position.z,
+    },
+    has_key,
+    cameraOffsetX,
+    selectedLanguage,
+  };
+
+  localStorage.setItem("myGameSave", JSON.stringify(saveData));
+
+  if (selectedLanguage === "eng") {
+    uiHint.innerText = "You unlocked the door!";
+  } else if (selectedLanguage === "ar") {
+    uiHint.innerText = "تم حفظ اللعبة";
+  } else {
+    uiHint.innerText = "游戏已保存";
+  }
+}
+
+//autosave every 30 seconds
+setInterval(() => {
+  if (gameStarted) {
+    saveGame();
+  }
+}, 30000);
+
+function loadGame() {
+  const data = localStorage.getItem("myGameSave");
+  //actually make sure data is loaded. thank u for drilling this into my mind prof Barnett u a real one
+  if (!data) {
+    alert("No save file found.");
+    return;
+  }
+
+  const saveData = JSON.parse(data);
+
+  //restore player position
+  playerCube.body.position.set(
+    saveData.playerPosition.x,
+    saveData.playerPosition.y,
+    saveData.playerPosition.z,
+  );
+  playerCube.updateMesh();
+
+  //green cube
+  greenCube.body.position.set(
+    saveData.greenCubePos.x,
+    saveData.greenCubePos.y,
+    saveData.greenCubePos.z,
+  );
+  greenCube.updateMesh();
+
+  //blue cube
+  blueCube.body.position.set(
+    saveData.blueCubePos.x,
+    saveData.blueCubePos.y,
+    saveData.blueCubePos.z,
+  );
+  blueCube.updateMesh();
+
+  //put the varaibles back lol
+  has_key = saveData.has_key;
+  cameraOffsetX = saveData.cameraOffsetX;
+  selectedLanguage = saveData.selectedLanguage;
+
+  updateCameraPosition();
+
+  //test if working :p
+  //alert("Game loaded!");
+  if (selectedLanguage === "eng") {
+    uiHint.innerText = "You unlocked the door!";
+  } else if (selectedLanguage === "ar") {
+    uiHint.innerText = "تم تحميل اللعبة";
+  } else {
+    uiHint.innerText = "游戏已加载";
+  }
 }

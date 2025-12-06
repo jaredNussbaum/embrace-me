@@ -73,3 +73,24 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   text-align: right;
 }
+
+#save-load-ui {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 9999;
+}
+
+#save-load-ui button {
+  font-size: 20px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #ffffff;
+  color: rgb(0, 0, 0);
+  border: 1px solid #555;
+  cursor: pointer;
+  opacity: 0.7;
+}
