@@ -1,0 +1,42 @@
+{
+  "ui-text": [
+    "Collect the key and open the door to win!",
+    "احصل على المفتاح وافتح الصندوق للفوز!",
+    "收集钥匙，打开宝箱，即可获胜"
+  ],
+  "pickup-key": [
+    "You've picked up the key!",
+    "لقد التقطت المفتاح",
+    "你已经拿到钥匙了。"
+  ],
+  "key-hint": [
+    "Click the key to pick it up!",
+    "انقر على المفتاح لالتقاطه",
+    "点击钥匙即可拾取。"
+  ],
+  "door-hint": [
+    "The door is locked. You need the key.",
+    "الباب مُغلق. تحتاج المفتاح.",
+    "门锁了，你需要钥匙"
+  ],
+  "unlock-door": [
+    "You unlocked the door!",
+    "لقد فتحت الباب",
+    "你打开了门锁。"
+  ],
+  "game-saved": [
+    "Game Saved",
+    "ARABIC PLACEHOLDER",
+    "CHINESE PLACEHOLDER"
+  ],
+  "game-loaded": [
+    "Game Loaded",
+    "ARABIC PLACEHOLDER",
+    "CHINESE PLACEHOLDER"
+  ],
+  "victory": [
+    "Victory!!",
+    "انتصار",
+    "胜利"
+  ]
+}

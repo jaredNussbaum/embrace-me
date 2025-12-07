@@ -1,8 +1,11 @@
 // deno-lint-ignore-file
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
+import { LanguageManager } from "./language-manager.ts";
 import { Box, GameObject, Player } from "./object.ts";
 import "./style.css";
+
+const langData = new LanguageManager();
 
 const viewportWidth = globalThis.innerWidth;
 const viewportHeight = globalThis.innerHeight;
@@ -55,10 +58,11 @@ const EngButton = document.getElementById("eng")!;
 const ArButton = document.getElementById("ar")!;
 const ChButton = document.getElementById("ch")!;
 
-let selectedLanguage: string | null = null;
 let gameStarted = false;
 
 function startGame() {
+  startMenu.style.display = "none";
+  ui.innerText = langData.get("ui-text");
   if (!gameStarted) {
     gameStarted = true;
     animate();
@@ -66,35 +70,19 @@ function startGame() {
 }
 
 EngButton.onclick = () => {
-  chooseLanguage("eng");
-  startMenu.style.display = "none";
+  langData.setLanguage("eng");
   startGame();
 };
 
 ArButton.onclick = () => {
-  chooseLanguage("ar");
-  startMenu.style.display = "none";
+  langData.setLanguage("ar");
   startGame();
 };
 
 ChButton.onclick = () => {
-  chooseLanguage("ch");
-  startMenu.style.display = "none";
+  langData.setLanguage("ch");
   startGame();
 };
-
-function chooseLanguage(lang: string) {
-  selectedLanguage = lang;
-
-  //display language
-  if (lang === "eng") {
-    ui.innerText = "Collect the key and open the door to win!";
-  } else if (lang === "ar") {
-    ui.innerText = "احصل على المفتاح وافتح الصندوق للفوز!";
-  } else if (lang === "ch") {
-    ui.innerText = "收集钥匙，打开宝箱，即可获胜";
-  }
-}
 
 // ######################################################
 //
@@ -118,14 +106,7 @@ canvas.addEventListener("click", (event: MouseEvent) => {
   if (underPointer(keyCube)) {
     has_key = true;
 
-    //change the language of the text
-    if (selectedLanguage === "eng") {
-      ui.innerText = "You've picked up the key!";
-    } else if (selectedLanguage === "ar") {
-      ui.innerText = "لقد التقطت المفتاح";
-    } else {
-      ui.innerText = "你已经拿到钥匙了。";
-    }
+    ui.innerText = langData.get("pickup-key");
 
     //explode the key cube
     scene.remove(keyCube.mesh);
@@ -393,30 +374,12 @@ function updateHintText() {
   const distDoor = distance(playerCube, door);
 
   if (!has_key && distKey < 6) {
-    if (selectedLanguage === "eng") {
-      uiHint.innerText = "Click the key to pick it up!";
-    } else if (selectedLanguage === "ar") {
-      uiHint.innerText = "انقر على المفتاح لالتقاطه";
-    } else {
-      uiHint.innerText = "点击钥匙即可拾取。";
-    }
+    uiHint.innerText = langData.get("key-hint");
   } else if (distDoor < 5) {
     if (!has_key) {
-      if (selectedLanguage === "eng") {
-        uiHint.innerText = "The door is locked. You need the key.";
-      } else if (selectedLanguage === "ar") {
-        uiHint.innerText = "الباب مُغلق. تحتاج المفتاح.";
-      } else {
-        uiHint.innerText = "门锁了，你需要钥匙";
-      }
+      uiHint.innerText = langData.get("door-hint");
     } else {
-      if (selectedLanguage === "eng") {
-        uiHint.innerText = "You unlocked the door!";
-      } else if (selectedLanguage === "ar") {
-        uiHint.innerText = "لقد فتحت الباب";
-      } else {
-        uiHint.innerText = "你打开了门锁。";
-      }
+      uiHint.innerText = langData.get("unlock-door");
     }
   } else {
     uiHint.innerText = "";
@@ -436,6 +399,8 @@ saveButton.onclick = saveGame;
 loadButton.onclick = loadGame;
 
 function saveGame() {
+  const currentLang = langData.lang;
+
   const saveData = {
     playerPosition: {
       x: playerCube.body.position.x,
@@ -454,18 +419,12 @@ function saveGame() {
     },
     has_key,
     cameraOffsetX,
-    selectedLanguage,
+    currentLang,
   };
 
   localStorage.setItem("myGameSave", JSON.stringify(saveData));
 
-  if (selectedLanguage === "eng") {
-    uiHint.innerText = "You unlocked the door!";
-  } else if (selectedLanguage === "ar") {
-    uiHint.innerText = "تم حفظ اللعبة";
-  } else {
-    uiHint.innerText = "游戏已保存";
-  }
+  ui.innerText = langData.get("game-saved");
 }
 
 //autosave every 30 seconds
@@ -512,19 +471,13 @@ function loadGame() {
   //put the varaibles back lol
   has_key = saveData.has_key;
   cameraOffsetX = saveData.cameraOffsetX;
-  selectedLanguage = saveData.selectedLanguage;
+  langData.setLanguage(saveData.currentLang);
 
   updateCameraPosition();
 
   //test if working :p
   //alert("Game loaded!");
-  if (selectedLanguage === "eng") {
-    uiHint.innerText = "You unlocked the door!";
-  } else if (selectedLanguage === "ar") {
-    uiHint.innerText = "تم تحميل اللعبة";
-  } else {
-    uiHint.innerText = "游戏已加载";
-  }
+  ui.innerText = langData.get("game-loaded");
 }
 
 // ######################################################
@@ -569,12 +522,6 @@ function instantiate_second_scene_objects(wrld: CANNON.World, sc: THREE.Scene) {
   current_scene = sc;
   current_world = wrld;
 
-  if (selectedLanguage === "eng") {
-    ui.innerText = "Victory!!";
-  } else if (selectedLanguage === "ar") {
-    ui.innerText = "انتصار";
-  } else {
-    ui.innerText = "胜利";
-  }
+  ui.innerText = langData.get("victory");
   uiHint.innerText = "";
 }
