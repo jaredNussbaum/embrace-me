@@ -125,7 +125,7 @@ const uiHint = document.getElementById("ui-hint")!;
 
 // ######################################################
 //
-// Player and Camera Bounds
+// Camera Movement
 //
 // #####################################################
 
@@ -136,10 +136,22 @@ const BOUNDS = {
   maxY: 5,
 };
 
-let cameraOffsetX = 0;
-
 //when the player moves the camera shifts to their new location
 const CAMERA_SHIFT_X = BOUNDS.maxX - BOUNDS.minX;
+
+function updateCamera() {
+  const pos = playerCube.body.position;
+
+  // player moves to the room to the right
+  if (pos.x > camera.position.x + BOUNDS.maxX) {
+    camera.position.x += CAMERA_SHIFT_X;
+  }
+
+  // player moves to the room on the left
+  if (pos.x < camera.position.x + BOUNDS.minX) {
+    camera.position.x -= CAMERA_SHIFT_X;
+  }
+}
 
 // ######################################################
 //
@@ -150,9 +162,90 @@ const CAMERA_SHIFT_X = BOUNDS.maxX - BOUNDS.minX;
 const playerCube = new Player(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2, speed);
 playerCube.addToGame(world, scene);
 
+// Player collision with door
+playerCube.body.addEventListener("collide", (ev: any) => {
+  if (ev.body === door.body && has_key === true && !sc_2_booted) {
+    scene.remove.apply(scene, scene.children);
+    boot_second_scene();
+  }
+});
+
+// Player collision with any floor object
+playerCube.body.addEventListener("collide", (ev: any) => {
+  if (ev.body === bottomWall.body || ev.body === greenCube.body || ev.body === blueCube.body || ev.body === step.body) {
+    playerCube.isGrounded = true;
+  }
+});
+
 // ######################################################
 //
-// Environment
+// Player Input
+//
+// ######################################################
+
+const input = {
+  up: false,
+  down: false,
+  left: false,
+  right: false,
+  jump: false,
+};
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "d") input.right = true;
+  if (e.key === "a") input.left = true;
+  if (e.key === "w") input.up = true;
+  if (e.key === "s") input.down = true;
+  if (e.code === "Space") input.jump = true;
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.key === "d") input.right = false;
+  if (e.key === "a") input.left = false;
+  if (e.key === "w") input.up = false;
+  if (e.key === "s") input.down = false;
+  if (e.code === "Space") input.jump = false;
+});
+
+// ######################################################
+//
+// Touchscreen Control Buttons
+//
+// ######################################################
+
+const upButton = document.getElementById("up-button") as HTMLButtonElement;
+const leftButton = document.getElementById("left-button") as HTMLButtonElement;
+const rightButton = document.getElementById("right-button") as HTMLButtonElement;
+const downButton = document.getElementById("down-button") as HTMLButtonElement;
+const jumpButton = document.getElementById("jump-button") as HTMLButtonElement;
+
+//helper funct to bind mouse movement to buttons
+function bindButton(btn: HTMLButtonElement, onPress: () => void, onRelease: () => void) {
+  btn.addEventListener("mousedown", onPress);
+  btn.addEventListener("mouseup", onRelease);
+  btn.addEventListener("mouseleave", onRelease);
+
+  //touch support
+  btn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    onPress();
+  });
+  btn.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    onRelease();
+  });
+}
+
+//bind buttons to WASD
+bindButton(upButton, () => input.up = true, () => input.up = false);
+bindButton(downButton, () => input.down = true, () => input.down = false);
+bindButton(leftButton, () => input.left = true, () => input.left = false);
+bindButton(rightButton, () => input.right = true, () => input.right = false);
+bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
+
+// ######################################################
+//
+// Interactable Items
 //
 // ######################################################
 
@@ -164,9 +257,6 @@ greenCube.addToGame(world, scene);
 
 const keyCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-20, 0, 0), 0xfff135, 2);
 keyCube.addToGame(world, scene);
-
-const chestCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(20, 0, 0), 0x7b3f00, 2);
-chestCube.addToGame(world, scene);
 
 const door = new Box(new CANNON.Vec3(1, 5, 3), new CANNON.Vec3(8.5, -1, -2), 0x7b3f00, 0);
 door.addToGame(world, scene);
@@ -207,6 +297,7 @@ rightRoomWall.addToGame(world, scene);
 const leftRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(-25, -1, -1.5), 0x444444, 0);
 leftRoomWall.addToGame(world, scene);
 
+// the step in the left room
 const step = new Box(new CANNON.Vec3(1, 1, 2), new CANNON.Vec3(-10, -3, -1.5), 0x444444, 0);
 step.addToGame(world, scene);
 
@@ -228,12 +319,11 @@ function animate() {
   blueCube.updateMesh();
   greenCube.updateMesh();
   keyCube.updateMesh();
-  chestCube.updateMesh();
 
   //check player/camera location
-  checkCameraShift();
+  updateCamera();
 
-  //display some hints meyhaps
+  //display some hints based on player location
   updateHintText();
 
   renderer.render(current_scene, camera);
@@ -249,117 +339,6 @@ function animate() {
 function distance(a: GameObject, b: GameObject) {
   return a.body.position.vsub(b.body.position).length();
 }
-
-// ######################################################
-//
-// Player Input
-//
-// ######################################################
-
-playerCube.body.addEventListener("collide", (ev: any) => {
-  if (ev.body === bottomWall.body || ev.body === greenCube.body || ev.body === blueCube.body || ev.body === step.body) {
-    playerCube.isGrounded = true;
-  }
-});
-
-const input = {
-  up: false,
-  down: false,
-  left: false,
-  right: false,
-  jump: false,
-};
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "d") input.right = true;
-  if (e.key === "a") input.left = true;
-  if (e.key === "w") input.up = true;
-  if (e.key === "s") input.down = true;
-  if (e.code === "Space") input.jump = true;
-});
-
-document.addEventListener("keyup", (e) => {
-  if (e.key === "d") input.right = false;
-  if (e.key === "a") input.left = false;
-  if (e.key === "w") input.up = false;
-  if (e.key === "s") input.down = false;
-  if (e.code === "Space") input.jump = false;
-});
-
-// ######################################################
-//
-// New Scene Functionality
-//
-// ######################################################
-
-playerCube.body.addEventListener("collide", (ev: any) => {
-  if (ev.body === door.body && has_key === true && !sc_2_booted) {
-    scene.remove.apply(scene, scene.children);
-    boot_second_scene();
-  }
-});
-
-// ######################################################
-//
-// Camera Functionality
-//
-// ######################################################
-
-function updateCameraPosition() {
-  camera.position.x = cameraOffsetX;
-}
-
-function checkCameraShift() {
-  const pos = playerCube.body.position;
-
-  // player moves to the room to the right
-  if (pos.x > cameraOffsetX + BOUNDS.maxX) {
-    cameraOffsetX += CAMERA_SHIFT_X;
-    updateCameraPosition();
-  }
-
-  // player moves to the room on the left
-  if (pos.x < cameraOffsetX + BOUNDS.minX) {
-    cameraOffsetX -= CAMERA_SHIFT_X;
-    updateCameraPosition();
-  }
-}
-
-// ######################################################
-//
-// Button Functionality
-//
-// ######################################################
-
-const upButton = document.getElementById("up-button") as HTMLButtonElement;
-const leftButton = document.getElementById("left-button") as HTMLButtonElement;
-const rightButton = document.getElementById("right-button") as HTMLButtonElement;
-const downButton = document.getElementById("down-button") as HTMLButtonElement;
-const jumpButton = document.getElementById("jump-button") as HTMLButtonElement;
-
-//helper funct to bind mouse movement to buttons
-function bindButton(btn: HTMLButtonElement, onPress: () => void, onRelease: () => void) {
-  btn.addEventListener("mousedown", onPress);
-  btn.addEventListener("mouseup", onRelease);
-  btn.addEventListener("mouseleave", onRelease);
-
-  //touch support
-  btn.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    onPress();
-  });
-  btn.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    onRelease();
-  });
-}
-
-//bind buttons to WASD
-bindButton(upButton, () => input.up = true, () => input.up = false);
-bindButton(downButton, () => input.down = true, () => input.down = false);
-bindButton(leftButton, () => input.left = true, () => input.left = false);
-bindButton(rightButton, () => input.right = true, () => input.right = false);
-bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
 
 // ######################################################
 //
@@ -400,6 +379,7 @@ loadButton.onclick = loadGame;
 
 function saveGame() {
   const currentLang = langData.lang;
+  const cameraOffset = camera.position.x;
 
   const saveData = {
     playerPosition: {
@@ -418,7 +398,7 @@ function saveGame() {
       z: blueCube.body.position.z,
     },
     has_key,
-    cameraOffsetX,
+    cameraOffset,
     currentLang,
   };
 
@@ -470,10 +450,8 @@ function loadGame() {
 
   //put the varaibles back lol
   has_key = saveData.has_key;
-  cameraOffsetX = saveData.cameraOffsetX;
+  camera.position.x = saveData.cameraOffset;
   langData.setLanguage(saveData.currentLang);
-
-  updateCameraPosition();
 
   //test if working :p
   //alert("Game loaded!");
