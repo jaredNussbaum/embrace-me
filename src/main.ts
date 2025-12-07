@@ -16,11 +16,9 @@ const camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight);
 camera.position.z = 6.5;
 camera.rotation.x = -0.25;
 
-const renderer = new THREE.WebGLRenderer();
+const canvas = document.getElementById("canvas")!;
+const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(viewportWidth, viewportHeight);
-
-const canvas = renderer.domElement;
-document.body.appendChild(canvas);
 
 // SEPARATE Cannon physics setup
 const world = new CANNON.World();
@@ -50,31 +48,12 @@ world.defaultContactMaterial = contactMaterial;
 //
 // ######################################################
 
-const startMenu = document.createElement("div");
-startMenu.id = "start-menu";
-document.body.appendChild(startMenu);
-
-//game title
-const title = document.createElement("div");
-title.innerText = "GAME TITLE HERE";
-title.id = "title-text";
-startMenu.appendChild(title);
-
-//button helper
-function makeMenuButton(label: string): HTMLButtonElement {
-  const button = document.createElement("button");
-  button.innerText = label;
-  button.classList.add("menu-button");
-  return button;
-}
+const startMenu = document.getElementById("start-menu")!;
 
 // Language buttons
-const EngButton = makeMenuButton("English");
-const ArButton = makeMenuButton("Arabic");
-const ChButton = makeMenuButton("Chinese");
-startMenu.appendChild(EngButton);
-startMenu.appendChild(ArButton);
-startMenu.appendChild(ChButton);
+const EngButton = document.getElementById("eng")!;
+const ArButton = document.getElementById("ar")!;
+const ChButton = document.getElementById("ch")!;
 
 let selectedLanguage: string | null = null;
 let gameStarted = false;
@@ -108,17 +87,12 @@ function chooseLanguage(lang: string) {
   selectedLanguage = lang;
 
   //display language
-  const ui = document.getElementById("ui-text");
-  if (ui) {
-    if (lang === "eng") {
-      ui.innerText = "Collect the key and open the chest to win!";
-    }
-    if (lang === "ar") {
-      ui.innerText = "احصل على المفتاح وافتح الصندوق للفوز!";
-    }
-    if (lang === "ch") {
-      ui.innerText = "收集钥匙，打开宝箱，即可获胜";
-    }
+  if (lang === "eng") {
+    ui.innerText = "Collect the key and open the door to win!";
+  } else if (lang === "ar") {
+    ui.innerText = "احصل على المفتاح وافتح الصندوق للفوز!";
+  } else if (lang === "ch") {
+    ui.innerText = "收集钥匙，打开宝箱，即可获胜";
   }
 }
 
@@ -157,27 +131,6 @@ canvas.addEventListener("click", (event: MouseEvent) => {
     scene.remove(keyCube.mesh);
     world.removeBody(keyCube.body);
   }
-
-  if (underPointer(door)) {
-    if (has_key === false) {
-      if (selectedLanguage === "eng") {
-        ui.innerText = "You need the key to unlock this door!";
-      } else if (selectedLanguage === "ar") {
-        ui.innerText = "تحتاج إلى المفتاح لفتح هذا الباب";
-      } else {
-        ui.innerText = "你需要钥匙才能打开这扇门。";
-      }
-    } else {
-      if (selectedLanguage === "eng") {
-        ui.innerText = "you've unlocked the door! You Win!";
-      } else if (selectedLanguage === "ar") {
-        ui.innerText = "لقد فتحت الباب! لقد فزت";
-      } else {
-        ui.innerText = "你已经打开了门！你赢了！";
-      }
-      winGame();
-    }
-  }
 });
 
 // ######################################################
@@ -186,15 +139,8 @@ canvas.addEventListener("click", (event: MouseEvent) => {
 //
 // ######################################################
 
-const ui = document.createElement("div");
-ui.id = "ui-text";
-ui.innerText = "Collect the key and open the chest to win!";
-document.body.appendChild(ui);
-
-const uiHint = document.createElement("div");
-uiHint.id = "ui-hint";
-uiHint.innerText = ""; //starts blank
-document.body.appendChild(uiHint);
+const ui = document.getElementById("ui-text")!;
+const uiHint = document.getElementById("ui-hint")!;
 
 // ######################################################
 //
@@ -303,9 +249,6 @@ function animate() {
   keyCube.updateMesh();
   chestCube.updateMesh();
 
-  //check the win/lose condition every frame
-  checkLose();
-
   //check player/camera location
   checkCameraShift();
 
@@ -370,58 +313,10 @@ document.addEventListener("keyup", (e) => {
 
 playerCube.body.addEventListener("collide", (ev: any) => {
   if (ev.body === door.body && has_key === true && !sc_2_booted) {
-    //TODO: add functionality such that when the player approaches the door, the scene changes
     scene.remove.apply(scene, scene.children);
     boot_second_scene();
   }
 });
-
-// ######################################################
-//
-// Win Screen
-//
-// ######################################################
-
-function winGame() {
-  const ui = document.getElementById("ui-text");
-  if (ui) ui.innerText = "YOU WON!";
-
-  playerCube.body.velocity.set(0, 0, 0);
-  playerCube.body.angularVelocity.set(0, 0, 0);
-
-  blueCube.body.velocity.set(0, 0, 0);
-  blueCube.body.angularVelocity.set(0, 0, 0);
-}
-
-// ######################################################
-//
-// Check Lose Conditions
-//
-// ######################################################
-
-function checkLose() {
-  const bluePos = blueCube.body.position;
-
-  if (
-    bluePos.x < BOUNDS.minX ||
-    bluePos.x > BOUNDS.maxX ||
-    bluePos.y < BOUNDS.minY ||
-    bluePos.y > BOUNDS.maxY
-  ) {
-    loseGame();
-  }
-}
-
-// ######################################################
-//
-// Lose Screen
-//
-// ######################################################
-
-function loseGame() {
-  const ui = document.getElementById("ui-text");
-  if (ui) ui.innerText = "Game Over - Cube Has Left The Bounds";
-}
 
 // ######################################################
 //
@@ -455,39 +350,11 @@ function checkCameraShift() {
 //
 // ######################################################
 
-//sorry this looks like absolute poop, i am so bad with this kinda stuff
-const controlsUI = document.createElement("div");
-controlsUI.id = "controls-ui";
-document.body.appendChild(controlsUI);
-
-//button maker helper
-function makeControlButton(label: string) {
-  const button = document.createElement("button");
-  button.innerText = label;
-  button.classList.add("control-button");
-  return button;
-}
-
-const upButton = makeControlButton("⬆️");
-const leftButton = makeControlButton("⬅️");
-const rightButton = makeControlButton("➡️");
-const downButton = makeControlButton("⬇️");
-const jumpButton = makeControlButton("🆙"); //changed to emoji cos other laguages
-
-//top row
-controlsUI.appendChild(document.createElement("div")); //empty cell
-controlsUI.appendChild(upButton);
-controlsUI.appendChild(document.createElement("div"));
-
-//middle row
-controlsUI.appendChild(leftButton);
-controlsUI.appendChild(downButton);
-controlsUI.appendChild(rightButton);
-
-//bottom jump trow
-controlsUI.appendChild(document.createElement("div"));
-controlsUI.appendChild(jumpButton);
-controlsUI.appendChild(document.createElement("div"));
+const upButton = document.getElementById("up-button") as HTMLButtonElement;
+const leftButton = document.getElementById("left-button") as HTMLButtonElement;
+const rightButton = document.getElementById("right-button") as HTMLButtonElement;
+const downButton = document.getElementById("down-button") as HTMLButtonElement;
+const jumpButton = document.getElementById("jump-button") as HTMLButtonElement;
 
 //helper funct to bind mouse movement to buttons
 function bindButton(btn: HTMLButtonElement, onPress: () => void, onRelease: () => void) {
@@ -520,13 +387,11 @@ bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
 // ######################################################
 
 function updateHintText() {
-  //const uiHint = document.getElementById("ui-hint");
   if (!uiHint) return;
 
   const distKey = distance(playerCube, keyCube);
   const distDoor = distance(playerCube, door);
 
-  //please please please someone whos better at coding refactor this to not be ass
   if (!has_key && distKey < 6) {
     if (selectedLanguage === "eng") {
       uiHint.innerText = "Click the key to pick it up!";
@@ -535,10 +400,7 @@ function updateHintText() {
     } else {
       uiHint.innerText = "点击钥匙即可拾取。";
     }
-    return;
-  }
-
-  if (distDoor < 3) {
+  } else if (distDoor < 5) {
     if (!has_key) {
       if (selectedLanguage === "eng") {
         uiHint.innerText = "The door is locked. You need the key.";
@@ -556,10 +418,9 @@ function updateHintText() {
         uiHint.innerText = "你打开了门锁。";
       }
     }
-    return;
+  } else {
+    uiHint.innerText = "";
   }
-
-  //uiHint.innerText = "";
 }
 
 // ######################################################
@@ -568,15 +429,8 @@ function updateHintText() {
 //
 // ######################################################
 
-const saveButton = makeMenuButton("Save Game");
-const loadButton = makeMenuButton("Load Game");
-
-const saveLoadUI = document.createElement("div");
-saveLoadUI.id = "save-load-ui";
-document.body.appendChild(saveLoadUI);
-
-saveLoadUI.appendChild(saveButton);
-saveLoadUI.appendChild(loadButton);
+const saveButton = document.getElementById("save-button")!;
+const loadButton = document.getElementById("load-button")!;
 
 saveButton.onclick = saveGame;
 loadButton.onclick = loadGame;
@@ -722,4 +576,5 @@ function instantiate_second_scene_objects(wrld: CANNON.World, sc: THREE.Scene) {
   } else {
     ui.innerText = "胜利";
   }
+  uiHint.innerText = "";
 }
