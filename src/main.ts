@@ -2,7 +2,7 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 import { LanguageManager } from "./language-manager.ts";
-import { Box, GameObject, Player } from "./object.ts";
+import { Box, GameObject, Player, PlayerInputFlags } from "./object.ts";
 import { Scene } from "./scene.ts";
 import "./style.css";
 
@@ -161,7 +161,7 @@ playerCube.body.addEventListener("collide", (ev: any) => {
 //
 // ######################################################
 
-const input = {
+const input: PlayerInputFlags = {
   up: false,
   down: false,
   left: false,

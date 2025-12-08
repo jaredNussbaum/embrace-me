@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-explicit-any
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 
@@ -46,6 +45,14 @@ class Box extends GameObject {
   }
 }
 
+export interface PlayerInputFlags {
+  up: boolean;
+  down: boolean;
+  left: boolean;
+  right: boolean;
+  jump: boolean;
+}
+
 class Player extends Box {
   speed: number;
   isGrounded: boolean;
@@ -67,7 +74,7 @@ class Player extends Box {
   jump() {
     this.body.velocity.y = 9; // jump height
   }
-  processInput(input: any) {
+  processInput(input: PlayerInputFlags) {
     if (input.right) this.set_vx(1);
     else if (input.left) this.set_vx(-1);
     else if (!input.right && !input.left) this.set_vx(0);
