@@ -3,6 +3,7 @@ import * as CANNON from "cannon-es";
 import * as THREE from "three";
 import { LanguageManager } from "./language-manager.ts";
 import { Box, GameObject, Player } from "./object.ts";
+import { Scene } from "./scene.ts";
 import "./style.css";
 
 const langData = new LanguageManager();
@@ -13,8 +14,9 @@ const viewportHeight = globalThis.innerHeight;
 const speed = 2;
 let has_key = false;
 
-// Three.js setup
-const scene = new THREE.Scene();
+let scene = new Scene();
+
+// Three js camera and renderer are independent of scene
 const camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight);
 camera.position.z = 6.5;
 camera.rotation.x = -0.25;
@@ -22,28 +24,6 @@ camera.rotation.x = -0.25;
 const canvas = document.getElementById("canvas")!;
 const renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(viewportWidth, viewportHeight);
-
-// SEPARATE Cannon physics setup
-const world = new CANNON.World();
-
-//add gravity
-world.gravity.set(0, -9.82, 0); // x, y, z gravity
-
-//add a new material to add friction and sliding
-const defaultMaterial = new CANNON.Material("default");
-
-const contactMaterial = new CANNON.ContactMaterial(
-  defaultMaterial,
-  defaultMaterial,
-  {
-    friction: 0.0,
-    restitution: 0.0,
-    frictionEquationRelaxation: 3,
-    frictionEquationStiffness: 1e7,
-  },
-);
-
-world.defaultContactMaterial = contactMaterial;
 
 // ######################################################
 //
@@ -109,8 +89,7 @@ canvas.addEventListener("click", (event: MouseEvent) => {
     ui.innerText = langData.get("pickup-key");
 
     //explode the key cube
-    scene.remove(keyCube.mesh);
-    world.removeBody(keyCube.body);
+    scene.removeGameObject(keyCube);
   }
 });
 
@@ -160,12 +139,11 @@ function updateCamera() {
 // ######################################################
 
 const playerCube = new Player(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2, speed);
-playerCube.addToGame(world, scene);
+scene.addGameObject(playerCube);
 
 // Player collision with door
 playerCube.body.addEventListener("collide", (ev: any) => {
   if (ev.body === door.body && has_key === true && !sc_2_booted) {
-    scene.remove.apply(scene, scene.children);
     boot_second_scene();
   }
 });
@@ -250,16 +228,16 @@ bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
 // ######################################################
 
 const blueCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(3, 0, 0), 0x00a0ff, 2);
-blueCube.addToGame(world, scene);
+scene.addGameObject(blueCube);
 
 const greenCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-3, 0, 0), 0x3bb143, 2);
-greenCube.addToGame(world, scene);
+scene.addGameObject(greenCube);
 
 const keyCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-20, 0, 0), 0xfff135, 2);
-keyCube.addToGame(world, scene);
+scene.addGameObject(keyCube);
 
 const door = new Box(new CANNON.Vec3(1, 5, 3), new CANNON.Vec3(8.5, -1, -2), 0x7b3f00, 0);
-door.addToGame(world, scene);
+scene.addGameObject(door);
 
 // ######################################################
 //
@@ -269,37 +247,37 @@ door.addToGame(world, scene);
 
 // Mass of 0 means it doesn't move!
 const bottomWall = new Box(new CANNON.Vec3(55, 1, 15), new CANNON.Vec3(0, -4, 0), 0x222222, 0);
-bottomWall.addToGame(world, scene);
+scene.addGameObject(bottomWall);
 
 const rightWall = new Box(new CANNON.Vec3(1, 8, 20), new CANNON.Vec3(9, -1, 1.5), 0x444444, 0);
-rightWall.addToGame(world, scene);
+scene.addGameObject(rightWall);
 
 const leftWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(-9, -1, 1.5), 0x444444, 0);
-leftWall.addToGame(world, scene);
+scene.addGameObject(leftWall);
 
 const leftWall2 = new Box(new CANNON.Vec3(1, 3.5, 2), new CANNON.Vec3(-9, -3, -1.5), 0xffffff, 0);
-leftWall2.addToGame(world, scene);
+scene.addGameObject(leftWall2);
 
 const leftWall3 = new Box(new CANNON.Vec3(1, 8, 5), new CANNON.Vec3(-9, -1, -5), 0x444444, 0);
-leftWall3.addToGame(world, scene);
+scene.addGameObject(leftWall3);
 
 const backWall = new Box(new CANNON.Vec3(50, 8, 1), new CANNON.Vec3(0, -1, -8), 0x333333, 0);
-backWall.addToGame(world, scene);
+scene.addGameObject(backWall);
 
 const frontBorder = new Box(new CANNON.Vec3(50, 8, 1), new CANNON.Vec3(0, -1, 4), 0x00000000, 0);
 frontBorder.mesh.visible = false;
-frontBorder.addToGame(world, scene);
+scene.addGameObject(frontBorder);
 
 //other wroom walls
 const rightRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(25, -1, -1.5), 0x444444, 0);
-rightRoomWall.addToGame(world, scene);
+scene.addGameObject(rightRoomWall);
 
 const leftRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(-25, -1, -1.5), 0x444444, 0);
-leftRoomWall.addToGame(world, scene);
+scene.addGameObject(leftRoomWall);
 
 // the step in the left room
 const step = new Box(new CANNON.Vec3(1, 1, 2), new CANNON.Vec3(-10, -3, -1.5), 0x444444, 0);
-step.addToGame(world, scene);
+scene.addGameObject(step);
 
 // ######################################################
 //
@@ -308,12 +286,10 @@ step.addToGame(world, scene);
 // ######################################################
 
 let current_player: Player = playerCube;
-let current_scene: THREE.Scene = scene;
-let current_world: CANNON.World = world;
 
 function animate() {
   current_player.processInput(input);
-  current_world.fixedStep();
+  scene.world.fixedStep();
 
   current_player.updateMesh();
   blueCube.updateMesh();
@@ -326,7 +302,7 @@ function animate() {
   //display some hints based on player location
   updateHintText();
 
-  renderer.render(current_scene, camera);
+  renderer.render(scene.visualScene, camera);
   requestAnimationFrame(animate);
 }
 
@@ -467,38 +443,17 @@ function loadGame() {
 let sc_2_booted: Boolean = false;
 
 function boot_second_scene() {
-  // Three.js setup
-
-  const camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight);
-  camera.position.z = 6.5;
-  camera.rotation.x = -0.25;
-
-  const renderer = new THREE.WebGLRenderer();
-  renderer.setSize(viewportWidth, viewportHeight);
-  const world_2 = new CANNON.World();
-  const scene_2 = new THREE.Scene();
-  const canvas = renderer.domElement;
-  document.body.appendChild(canvas);
-
-  // SEPARATE Cannon physics setup
-
-  //add gravity
-  world_2.gravity.set(0, -9.82, 0); // x, y, z gravity
-
-  world_2.addContactMaterial(contactMaterial);
-  world_2.defaultContactMaterial = contactMaterial;
+  scene = new Scene();
   sc_2_booted = true;
-  instantiate_second_scene_objects(world_2, scene_2);
+  instantiate_second_scene_objects();
 }
 
-function instantiate_second_scene_objects(wrld: CANNON.World, sc: THREE.Scene) {
+function instantiate_second_scene_objects() {
   const playerCube_2 = new Player(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2, speed);
-  playerCube_2.addToGame(wrld, sc);
+  scene.addGameObject(playerCube_2);
   const bottomWall_2 = new Box(new CANNON.Vec3(55, 1, 15), new CANNON.Vec3(0, -4, 0), 0x222222, 0);
-  bottomWall_2.addToGame(wrld, sc);
+  scene.addGameObject(bottomWall_2);
   current_player = playerCube_2;
-  current_scene = sc;
-  current_world = wrld;
 
   ui.innerText = langData.get("victory");
   uiHint.innerText = "";

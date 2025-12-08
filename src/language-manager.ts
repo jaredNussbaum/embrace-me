@@ -1,6 +1,10 @@
 // deno-lint-ignore-file no-explicit-any
 import languageData from "./data/language-data.json" with { type: "json" };
 
+/*
+this class serves as an interface for keeping track of the current language
+and for fetching data from language-data.json
+*/
 class LanguageManager {
   data: any;
   lang: number;
@@ -15,7 +19,6 @@ class LanguageManager {
     else if (lang === "ch") this.lang = 2;
   }
   get(key: string): string {
-    console.log(this.data);
     return this.data[key][this.lang];
   }
 }

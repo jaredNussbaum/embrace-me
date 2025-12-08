@@ -2,12 +2,17 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 
+let nextID: number = 0;
+
 class GameObject {
   body: CANNON.Body;
   mesh: THREE.Mesh;
+  id: number; // every object has a unique ID
   constructor(physicsbody: CANNON.Body, mesh: THREE.Mesh) {
     this.body = physicsbody;
     this.mesh = mesh;
+    this.id = nextID;
+    nextID++;
   }
   addToGame(world: CANNON.World, scene: THREE.Scene) {
     world.addBody(this.body);
