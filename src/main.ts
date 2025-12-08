@@ -43,6 +43,8 @@ let gameStarted = false;
 function startGame() {
   startMenu.style.display = "none";
   ui.innerText = langData.get("ui-text");
+  saveButton.innerText = langData.get("save-button");
+  loadButton.innerText = langData.get("load-button");
   if (!gameStarted) {
     gameStarted = true;
     animate();
@@ -66,41 +68,31 @@ ChButton.onclick = () => {
 
 // ######################################################
 //
-// 3D Mouse Events
-//
-// ######################################################
-
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
-
-function underPointer(object: GameObject): boolean {
-  raycaster.setFromCamera(pointer, camera);
-  const intersections = raycaster.intersectObject(object.mesh);
-  return intersections.length > 0;
-}
-
-canvas.addEventListener("click", (event: MouseEvent) => {
-  pointer.x = (event.offsetX / viewportWidth) * 2 - 1;
-  pointer.y = -(event.offsetY / viewportHeight) * 2 + 1;
-
-  if (underPointer(keyCube)) {
-    has_key = true;
-
-    ui.innerText = langData.get("pickup-key");
-
-    //explode the key cube
-    scene.removeGameObject(keyCube);
-  }
-});
-
-// ######################################################
-//
 // Text
 //
 // ######################################################
 
 const ui = document.getElementById("ui-text")!;
 const uiHint = document.getElementById("ui-hint")!;
+
+function updateHintText() {
+  if (!uiHint) return;
+
+  const distKey = distance(playerCube, keyCube);
+  const distDoor = distance(playerCube, door);
+
+  if (!has_key && distKey < 6) {
+    uiHint.innerText = langData.get("key-hint");
+  } else if (distDoor < 5) {
+    if (!has_key) {
+      uiHint.innerText = langData.get("door-hint");
+    } else {
+      uiHint.innerText = langData.get("unlock-door");
+    }
+  } else {
+    uiHint.innerText = "";
+  }
+}
 
 // ######################################################
 //
@@ -183,7 +175,7 @@ document.addEventListener("keyup", (e) => {
 
 // ######################################################
 //
-// Touchscreen Control Buttons
+// Touchscreen Input
 //
 // ######################################################
 
@@ -216,6 +208,34 @@ bindButton(downButton, () => input.down = true, () => input.down = false);
 bindButton(leftButton, () => input.left = true, () => input.left = false);
 bindButton(rightButton, () => input.right = true, () => input.right = false);
 bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
+
+// ######################################################
+//
+// 3D Mouse Events
+//
+// ######################################################
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+function underPointer(object: GameObject): boolean {
+  raycaster.setFromCamera(pointer, camera);
+  const intersections = raycaster.intersectObject(object.mesh);
+  return intersections.length > 0;
+}
+
+canvas.addEventListener("click", (event: MouseEvent) => {
+  pointer.x = (event.offsetX / viewportWidth) * 2 - 1;
+  pointer.y = -(event.offsetY / viewportHeight) * 2 + 1;
+
+  if (underPointer(keyCube)) {
+    has_key = true;
+    ui.innerText = langData.get("pickup-key");
+
+    //explode the key cube
+    scene.removeGameObject(keyCube);
+  }
+});
 
 // ######################################################
 //
@@ -258,41 +278,6 @@ function animate() {
 
   renderer.render(scene.visualScene, camera);
   requestAnimationFrame(animate);
-}
-
-// ######################################################
-//
-// Cube Movement
-//
-// ######################################################
-
-function distance(a: GameObject, b: GameObject) {
-  return a.body.position.vsub(b.body.position).length();
-}
-
-// ######################################################
-//
-// Hint Text
-//
-// ######################################################
-
-function updateHintText() {
-  if (!uiHint) return;
-
-  const distKey = distance(playerCube, keyCube);
-  const distDoor = distance(playerCube, door);
-
-  if (!has_key && distKey < 6) {
-    uiHint.innerText = langData.get("key-hint");
-  } else if (distDoor < 5) {
-    if (!has_key) {
-      uiHint.innerText = langData.get("door-hint");
-    } else {
-      uiHint.innerText = langData.get("unlock-door");
-    }
-  } else {
-    uiHint.innerText = "";
-  }
 }
 
 // ######################################################
@@ -405,4 +390,14 @@ function boot_second_scene() {
 
   ui.innerText = langData.get("victory");
   uiHint.innerText = "";
+}
+
+// ######################################################
+//
+// Helper Functions
+//
+// ######################################################
+
+function distance(a: GameObject, b: GameObject) {
+  return a.body.position.vsub(b.body.position).length();
 }
