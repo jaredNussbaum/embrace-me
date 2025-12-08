@@ -1,0 +1,102 @@
+{
+  "player": {
+    "name": "player",
+    "position": [0, 0, 0],
+    "size": [1, 1, 1],
+    "color": "#7000a0",
+    "mass": 2
+  },
+  "boxes": [
+    {
+      "name": "blue-cube",
+      "position": [3, 0, 0],
+      "size": [1, 1, 1],
+      "color": "#00a0ff",
+      "mass": 2
+    },
+    {
+      "name": "green-cube",
+      "position": [-3, 0, 0],
+      "size": [1, 1, 1],
+      "color": "#3bb143",
+      "mass": 2
+    },
+    {
+      "name": "key-cube",
+      "position": [-20, 0, 0],
+      "size": [1, 1, 1],
+      "color": "#fff135",
+      "mass": 2
+    },
+    {
+      "name": "door",
+      "position": [8.5, -1, -2],
+      "size": [1, 5, 3],
+      "color": "#7b3f00",
+      "mass": 0
+    },
+    {
+      "name": "floor",
+      "position": [0, -4, 0],
+      "size": [55, 1, 15],
+      "color": "#222222",
+      "mass": 0
+    },
+    {
+      "name": "front-border",
+      "position": [0, -1, 4],
+      "size": [50, 8, 1],
+      "color": "#000000",
+      "mass": 0
+    },
+    {
+      "name": "stair",
+      "position": [-10, -3, -1.5],
+      "size": [1, 1, 2],
+      "color": "#444444",
+      "mass": 0
+    },
+    {
+      "position": [9, -1, 1.5],
+      "size": [1, 8, 20],
+      "color": "#444444",
+      "mass": 0
+    },
+    {
+      "position": [-9, -1, 1.5],
+      "size": [1, 8, 4],
+      "color": "#444444",
+      "mass": 0
+    },
+    {
+      "position": [-9, -3, -1.5],
+      "size": [1, 3.5, 2],
+      "color": "#ffffff",
+      "mass": 0
+    },
+    {
+      "position": [-9, -1, -5],
+      "size": [1, 8, 5],
+      "color": "#444444",
+      "mass": 0
+    },
+    {
+      "position": [0, -1, -8],
+      "size": [50, 8, 1],
+      "color": "#333333",
+      "mass": 0
+    },
+    {
+      "position": [25, -1, -1.5],
+      "size": [1, 8, 11.5],
+      "color": "#444444",
+      "mass": 0
+    },
+    {
+      "position": [-25, -1, -1.5],
+      "size": [1, 8, 11.5],
+      "color": "#444444",
+      "mass": 0
+    }
+  ]
+}

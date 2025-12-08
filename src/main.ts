@@ -1,6 +1,7 @@
 // deno-lint-ignore-file
-import * as CANNON from "cannon-es";
 import * as THREE from "three";
+import scene1config from "./data/scene1.json" with { type: "json" };
+import scene2config from "./data/scene2.json" with { type: "json" };
 import { LanguageManager } from "./language-manager.ts";
 import { Box, GameObject, Player, PlayerInputFlags } from "./object.ts";
 import { Scene } from "./scene.ts";
@@ -11,10 +12,9 @@ const langData = new LanguageManager();
 const viewportWidth = globalThis.innerWidth;
 const viewportHeight = globalThis.innerHeight;
 
-const speed = 2;
 let has_key = false;
 
-let scene = new Scene();
+let scene = new Scene(scene1config);
 
 // Three js camera and renderer are independent of scene
 const camera = new THREE.PerspectiveCamera(75, viewportWidth / viewportHeight);
@@ -138,22 +138,18 @@ function updateCamera() {
 //
 // ######################################################
 
-const playerCube = new Player(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2, speed);
-scene.addGameObject(playerCube);
+const playerCube = scene.getGameObjectByName("player") as Player;
 
-// Player collision with door
-playerCube.body.addEventListener("collide", (ev: any) => {
-  if (ev.body === door.body && has_key === true && !sc_2_booted) {
+playerCube.body.addEventListener("collide", playerCollide);
+
+function playerCollide(ev: any) {
+  if (ev.body === door.body && has_key && !sc_2_booted) {
     boot_second_scene();
   }
-});
-
-// Player collision with any floor object
-playerCube.body.addEventListener("collide", (ev: any) => {
-  if (ev.body === bottomWall.body || ev.body === greenCube.body || ev.body === blueCube.body || ev.body === step.body) {
+  if (ev.body === floor.body || ev.body === greenCube.body || ev.body === blueCube.body || ev.body === stair.body) {
     playerCube.isGrounded = true;
   }
-});
+}
 
 // ######################################################
 //
@@ -171,18 +167,18 @@ const input: PlayerInputFlags = {
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "d") input.right = true;
-  if (e.key === "a") input.left = true;
-  if (e.key === "w") input.up = true;
-  if (e.key === "s") input.down = true;
-  if (e.code === "Space") input.jump = true;
+  else if (e.key === "a") input.left = true;
+  else if (e.key === "w") input.up = true;
+  else if (e.key === "s") input.down = true;
+  else if (e.code === "Space") input.jump = true;
 });
 
 document.addEventListener("keyup", (e) => {
   if (e.key === "d") input.right = false;
-  if (e.key === "a") input.left = false;
-  if (e.key === "w") input.up = false;
-  if (e.key === "s") input.down = false;
-  if (e.code === "Space") input.jump = false;
+  else if (e.key === "a") input.left = false;
+  else if (e.key === "w") input.up = false;
+  else if (e.key === "s") input.down = false;
+  else if (e.code === "Space") input.jump = false;
 });
 
 // ######################################################
@@ -223,61 +219,19 @@ bindButton(jumpButton, () => input.jump = true, () => input.jump = false);
 
 // ######################################################
 //
-// Interactable Items
+// Get GameObjects by name
 //
 // ######################################################
 
-const blueCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(3, 0, 0), 0x00a0ff, 2);
-scene.addGameObject(blueCube);
+const blueCube = scene.getGameObjectByName("blue-cube") as Box;
+const greenCube = scene.getGameObjectByName("green-cube") as Box;
+const keyCube = scene.getGameObjectByName("key-cube") as Box;
+const door = scene.getGameObjectByName("door") as Box;
 
-const greenCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-3, 0, 0), 0x3bb143, 2);
-scene.addGameObject(greenCube);
-
-const keyCube = new Box(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(-20, 0, 0), 0xfff135, 2);
-scene.addGameObject(keyCube);
-
-const door = new Box(new CANNON.Vec3(1, 5, 3), new CANNON.Vec3(8.5, -1, -2), 0x7b3f00, 0);
-scene.addGameObject(door);
-
-// ######################################################
-//
-// Walls
-//
-// ######################################################
-
-// Mass of 0 means it doesn't move!
-const bottomWall = new Box(new CANNON.Vec3(55, 1, 15), new CANNON.Vec3(0, -4, 0), 0x222222, 0);
-scene.addGameObject(bottomWall);
-
-const rightWall = new Box(new CANNON.Vec3(1, 8, 20), new CANNON.Vec3(9, -1, 1.5), 0x444444, 0);
-scene.addGameObject(rightWall);
-
-const leftWall = new Box(new CANNON.Vec3(1, 8, 4), new CANNON.Vec3(-9, -1, 1.5), 0x444444, 0);
-scene.addGameObject(leftWall);
-
-const leftWall2 = new Box(new CANNON.Vec3(1, 3.5, 2), new CANNON.Vec3(-9, -3, -1.5), 0xffffff, 0);
-scene.addGameObject(leftWall2);
-
-const leftWall3 = new Box(new CANNON.Vec3(1, 8, 5), new CANNON.Vec3(-9, -1, -5), 0x444444, 0);
-scene.addGameObject(leftWall3);
-
-const backWall = new Box(new CANNON.Vec3(50, 8, 1), new CANNON.Vec3(0, -1, -8), 0x333333, 0);
-scene.addGameObject(backWall);
-
-const frontBorder = new Box(new CANNON.Vec3(50, 8, 1), new CANNON.Vec3(0, -1, 4), 0x00000000, 0);
+let floor = scene.getGameObjectByName("floor") as Box;
+const stair = scene.getGameObjectByName("stair") as Box;
+const frontBorder = scene.getGameObjectByName("front-border") as Box;
 frontBorder.mesh.visible = false;
-scene.addGameObject(frontBorder);
-
-//other wroom walls
-const rightRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(25, -1, -1.5), 0x444444, 0);
-scene.addGameObject(rightRoomWall);
-
-const leftRoomWall = new Box(new CANNON.Vec3(1, 8, 11.5), new CANNON.Vec3(-25, -1, -1.5), 0x444444, 0);
-scene.addGameObject(leftRoomWall);
-
-// the step in the left room
-const step = new Box(new CANNON.Vec3(1, 1, 2), new CANNON.Vec3(-10, -3, -1.5), 0x444444, 0);
-scene.addGameObject(step);
 
 // ######################################################
 //
@@ -443,17 +397,11 @@ function loadGame() {
 let sc_2_booted: Boolean = false;
 
 function boot_second_scene() {
-  scene = new Scene();
+  scene = new Scene(scene2config);
   sc_2_booted = true;
-  instantiate_second_scene_objects();
-}
 
-function instantiate_second_scene_objects() {
-  const playerCube_2 = new Player(new CANNON.Vec3(1, 1, 1), new CANNON.Vec3(0, 0, 0), 0x7000a0, 2, speed);
-  scene.addGameObject(playerCube_2);
-  const bottomWall_2 = new Box(new CANNON.Vec3(55, 1, 15), new CANNON.Vec3(0, -4, 0), 0x222222, 0);
-  scene.addGameObject(bottomWall_2);
-  current_player = playerCube_2;
+  floor = scene.getGameObjectByName("floor") as Box;
+  current_player = scene.getGameObjectByName("player") as Player;
 
   ui.innerText = langData.get("victory");
   uiHint.innerText = "";

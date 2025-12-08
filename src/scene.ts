@@ -1,6 +1,6 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
-import { GameObject } from "./object.ts";
+import { Box, GameObject, Player } from "./object.ts";
 
 // define the default contact material for no friction
 const defaultMaterial = new CANNON.Material("default");
@@ -15,12 +15,25 @@ const contactMaterial = new CANNON.ContactMaterial(
   },
 );
 
+interface BoxConfig {
+  name?: string;
+  position: number[];
+  size: number[];
+  color: string;
+  mass: number;
+}
+
+interface SceneConfig {
+  player: BoxConfig;
+  boxes: BoxConfig[];
+}
+
 class Scene {
   visualScene: THREE.Scene;
   world: CANNON.World;
   children: Map<number, GameObject>; //key is the GameObject's id
   customNames: Map<string, number>; //associates custom names with the id of the gameobject
-  constructor() {
+  constructor(config?: SceneConfig) {
     //Three.js setup
     this.visualScene = new THREE.Scene();
 
@@ -32,12 +45,36 @@ class Scene {
 
     this.children = new Map<number, GameObject>();
     this.customNames = new Map<string, number>();
+
+    if (config !== undefined) this.loadSceneConfig(config);
+  }
+  loadSceneConfig(config: SceneConfig) {
+    // Create and add player
+    const PC = config.player;
+    const player = new Player(
+      new CANNON.Vec3(PC.size[0], PC.size[1], PC.size[2]),
+      new CANNON.Vec3(PC.position[0], PC.position[1], PC.position[2]),
+      new THREE.Color(PC.color),
+      PC.mass,
+    );
+    this.addGameObject(player, PC.name);
+
+    // Create and add every box
+    for (const BC of config.boxes) {
+      const box = new Box(
+        new CANNON.Vec3(BC.size[0], BC.size[1], BC.size[2]),
+        new CANNON.Vec3(BC.position[0], BC.position[1], BC.position[2]),
+        new THREE.Color(BC.color),
+        BC.mass,
+      );
+      this.addGameObject(box, BC.name);
+    }
   }
   addGameObject(object: GameObject, name?: string) {
     this.visualScene.add(object.mesh);
     this.world.addBody(object.body);
     this.children.set(object.id, object);
-    if (name) {
+    if (name !== undefined) {
       this.customNames.set(name, object.id);
     }
   }
@@ -53,7 +90,7 @@ class Scene {
   }
   getGameObjectByName(name: string): GameObject | undefined {
     const id = this.customNames.get(name);
-    if (id) {
+    if (id !== undefined) {
       return this.children.get(id);
     }
     return undefined;

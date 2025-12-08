@@ -56,10 +56,10 @@ export interface PlayerInputFlags {
 class Player extends Box {
   speed: number;
   isGrounded: boolean;
-  constructor(size: CANNON.Vec3, position: CANNON.Vec3, color: THREE.ColorRepresentation, mass: number, speed: number) {
+  constructor(size: CANNON.Vec3, position: CANNON.Vec3, color: THREE.ColorRepresentation, mass: number) {
     super(size, position, color, mass);
 
-    this.speed = speed;
+    this.speed = 2;
     this.isGrounded = true;
 
     this.body.angularVelocity.set(0, 10, 0); // for fun!!

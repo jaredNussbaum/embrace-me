@@ -1,0 +1,18 @@
+{
+  "player": {
+    "name": "player",
+    "position": [0, 0, 0],
+    "size": [1, 1, 1],
+    "color": "#7000a0",
+    "mass": 2
+  },
+  "boxes": [
+    {
+      "name": "floor",
+      "position": [0, -4, 0],
+      "size": [55, 1, 15],
+      "color": "#222222",
+      "mass": 0
+    }
+  ]
+}
