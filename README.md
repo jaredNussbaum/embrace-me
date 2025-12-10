@@ -1,4 +1,4 @@
-# EmBrace Me
+# Team 9+10 Game
 
 ## DevLog Entry 1 - 11/14/2025
 
